@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt; plt.ion()
+import matplotlib.pyplot as plt; plt.ion(); plt.close('all')
 
 import scipy.ndimage
 import skimage.morphology
@@ -9,6 +9,9 @@ import skimage.draw
 import phasepack; reload(phasepack)
 import cleaning; reload(cleaning)
 import utils; reload(utils)
+
+global TITLE_FONT_SIZE
+TITLE_FONT_SIZE = 'large'
 
 def isolate(neurite_marker, show):
     """
@@ -27,10 +30,10 @@ def isolate(neurite_marker, show):
             binary image indicating the presence of neurites
 
     """
-    # 0) handle input
+    # handle input
     raw = utils.handle_grayscale_image_input(neurite_marker)
 
-    # 1) determine local phase-symmetry -> maxima correspond to neurite
+    # determine local phase-symmetry -> maxima correspond to neurite
     phase = phasepack.phasesym(raw,
                                nscale=5,
                                norient=3,
@@ -42,46 +45,41 @@ def isolate(neurite_marker, show):
                                noiseMethod=-1)[0]
     phase = utils.rescale_0_255(phase)
 
-    # 2) (morphological) cleaning
+    # morphological cleaning
     clean = cleaning.morphological_cleaning(phase, disk_size=1)
 
-    # 3) threshold to binary mask
-    binary = clean > 1
+    # threshold to binary mask
+    binary = clean > 0
 
-    # 4) close image to connect isolated pieces of neurite
-    disk = skimage.morphology.disk(6)
+    # close image to connect isolated pieces of neurite
+    disk = skimage.morphology.disk(10)
     closed = skimage.morphology.closing(binary, disk)
 
-    # remove isolated pixels
+    # remove isolated blobs
     neurite_mask = cleaning.remove_small_objects(closed, size_threshold=64)
 
     if show == True:
-        fig = plt.figure()
-        fig.suptitle('Neurite isolation')
+        fig, axes = plt.subplots(2,2)
+        ax1, ax2, ax3, ax4 = axes.ravel()
 
-        ax1 = fig.add_subplot(2,4,1)
+        fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
+
         ax1.imshow(raw, cmap='gray')
         ax1.set_title('input image')
 
-        ax2 = fig.add_subplot(2,4,2)
         ax2.imshow(phase, cmap='gray')
         ax2.set_title('phase symmetry')
 
-        ax3 = fig.add_subplot(2,4,5)
         ax3.imshow(clean, cmap='gray')
         ax3.set_title('morphological cleaning')
 
-        ax4 = fig.add_subplot(2,4,6)
-        ax4.imshow(clean, cmap='gray')
-        ax4.set_title('morphological closing')
+        ax4.imshow(neurite_mask, cmap='gray')
+        ax4.set_title('threshold & morphological closing')
 
-        ax5 = fig.add_subplot(1,2,2)
-        ax5.imshow(neurite_mask, cmap='gray')
-        ax5.set_title('w/o small objects')
-
-        for ax in [ax1, ax2, ax3, ax4, ax5]:
+        for ax in [ax1, ax2, ax3, ax4]:
             ax.set_xticklabels([])
             ax.set_yticklabels([])
+
         fig.tight_layout()
 
     return neurite_mask
@@ -109,7 +107,7 @@ def get_length(neurite_mask, show=True):
 
     if show == True:
         fig, (ax1, ax2) = plt.subplots(1,2)
-        fig.suptitle('Neurite length')
+        fig.suptitle('Neurite length', fontsize=TITLE_FONT_SIZE)
 
         ax1.imshow(neurite_mask, cmap='gray')
         ax1.set_title('binary mask')
