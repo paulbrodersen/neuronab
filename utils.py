@@ -8,6 +8,16 @@ def rescale_0_255(img):
     img *= 255
     return img.astype(np.uint8)
 
+def imcomplement(img):
+    if img.dtype == np.bool:
+        complement = np.logical_not(img)
+    elif img.dtype == np.uint8:
+        complement = 255 - img
+    else:
+        print "Warning: Image type not uint8 or bool. Assuming maximum pixel intensity of 255 when computing the image complement."
+        complement = 255 - img
+    return complement
+
 def grayscale_to_rgb(img):
     return np.tile(img, (3,1,1)).transpose([1,2,0]).astype(np.uint8)
 

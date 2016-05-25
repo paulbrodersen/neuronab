@@ -2,7 +2,7 @@ import numpy as np
 import scipy.ndimage
 import skimage.morphology as sm
 
-from utils import rescale_0_255
+from utils import rescale_0_255, imcomplement
 
 def remove_small_objects(binary_img, size_threshold=100):
     label_objects, nb_labels = scipy.ndimage.label(binary_img)
@@ -19,21 +19,6 @@ def remove_large_objects(binary_img, size_threshold=100):
     mask_sizes[0] = 0
     clean = mask_sizes[label_objects]
     return clean
-
-def imcomplement(img):
-    complement = np.zeros_like(img)
-
-    if img.dtype == np.bool:
-        complement = np.logical_not(img)
-
-    elif img.dtype == np.uint8:
-        complement = 255 - img
-
-    else:
-        print "Image type not uint8 or bool. Assuming maximum pixel intensity of 255 when computing the image complement."
-        complement = 255 - img
-
-    return complement
 
 def morphological_cleaning(img, disk_size=2):
     disk = sm.disk(disk_size)
