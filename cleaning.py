@@ -2,6 +2,7 @@ import numpy as np
 import scipy.ndimage
 import skimage.morphology as sm
 
+import utils; reload(utils)
 from utils import rescale_0_255, imcomplement
 
 def remove_small_objects(binary_img, size_threshold=100):
