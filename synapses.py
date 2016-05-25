@@ -260,8 +260,11 @@ def _is_dual_labelled(primary, secondary, show):
     if show == True:
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         ax1.imshow(primary, cmap='gray')
+        ax1.set_title('primary marker')
         ax2.imshow(secondary, cmap='gray')
+        ax2.set_title('secondary marker')
         ax3.imshow(dual_labelled, cmap='gray')
+        ax3.set_title('dual labelled')
         for ax in [ax1, ax2, ax3]:
             ax.set_xticklabels([])
             ax.set_yticklabels([])
