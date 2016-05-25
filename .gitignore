@@ -1,0 +1,18 @@
+# ignore everything
+*
+
+# whitelist directories
+!*/
+
+# do not ignore
+!*.py
+!*.pyx
+!*.txt
+!*.c
+!.gitattributes
+!.gitignore
+!readme.md
+!.gitkeep
+!*.tex
+!*.pdf
+
