@@ -10,7 +10,7 @@ import phasepack; reload(phasepack)
 import cleaning; reload(cleaning)
 import utils; reload(utils)
 
-def isolate_neurites(neurite_marker, show):
+def isolate(neurite_marker, show):
     """
     Arguments:
     ----------
@@ -53,7 +53,7 @@ def isolate_neurites(neurite_marker, show):
     closed = skimage.morphology.closing(binary, disk)
 
     # remove isolated pixels
-    neurites = cleaning.remove_small_objects(dilated, size_threshold=64)
+    neurite_mask = cleaning.remove_small_objects(closed, size_threshold=64)
 
     if show == True:
         fig = plt.figure()
@@ -76,7 +76,7 @@ def isolate_neurites(neurite_marker, show):
         ax4.set_title('morphological closing')
 
         ax5 = fig.add_subplot(1,2,2)
-        ax5.imshow(neurites, cmap='gray')
+        ax5.imshow(neurite_mask, cmap='gray')
         ax5.set_title('w/o small objects')
 
         for ax in [ax1, ax2, ax3, ax4, ax5]:
@@ -84,7 +84,7 @@ def isolate_neurites(neurite_marker, show):
             ax.set_yticklabels([])
         fig.tight_layout()
 
-    return neurites
+    return neurite_mask
 
 def get_length(neurite_mask, show=True):
     """

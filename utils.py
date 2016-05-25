@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def rescale_0_255(img):
     img = img.astype(np.float)
@@ -23,9 +24,9 @@ def handle_grayscale_image_input(path_or_array):
     img = handle_image_input(path_or_array)
     assert np.ndim(img) == 2, \
         "Dimensionality of image is not 2! Is it really a grayscale image and not an RGB or RGBA image?"
-    if img.dtype != np.uint8:
-        raise Warning("Image not of type numpy.uint8. Casting to numpy.uint8 ...")
-        img = img.astype(np.uint8)
+    # if img.dtype != np.uint8:
+    #     print Warning("Image not of type numpy.uint8. Casting to numpy.uint8 ...")
+    #     img = img.astype(np.uint8)
     return img
 
 def handle_rgb_image_input(path_or_array):
@@ -39,6 +40,6 @@ def handle_binary_image_input(path_or_array):
     assert np.ndim(img) == 2, \
         "Dimensionality of image is not 2! Is it really a binary image and not an RGB or RGBA image?"
     if img.dtype != np.bool:
-        raise Warning("Image not of type numpy.bool. Casting to numpy.bool ...")
+        print Warning("Image not of type numpy.bool. Casting to numpy.bool ...")
         img = img.astype(np.bool)
     return img

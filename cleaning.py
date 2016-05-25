@@ -30,19 +30,16 @@ def imcomplement(img):
         complement = 255 - img
 
     else:
-        print "Warning: image type not uint8 or bool."
-        print "Assuming maximum pixel intensity of 255..."
+        print "Image type not uint8 or bool. Assuming maximum pixel intensity of 255 when computing the image complement."
         complement = 255 - img
 
     return complement
 
 def morphological_cleaning(img, disk_size=2):
-
     disk = sm.disk(disk_size)
     eroded = sm.erosion(img, disk)
     reconstructed = sm.reconstruction(eroded, img)
     dilated = sm.dilation(reconstructed, disk)
-
-    cleaned = sm.reconstruction(imcomplement(dilated), imcomplement(reconstructed))
-
-    return rescale_0_255(imcomplement(cleaned))
+    clean_complement = sm.reconstruction(imcomplement(dilated), imcomplement(reconstructed))
+    clean = imcomplement(clean_complement)
+    return rescale_0_255(clean)

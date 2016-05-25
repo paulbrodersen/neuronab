@@ -14,6 +14,7 @@ def count(neurite_marker,
           range_synapse_size=(9, 100),
           minimum_synapse_brightness=95.,
           show=True):
+
     """
     Arguments:
     ----------
@@ -69,13 +70,14 @@ def count(neurite_marker,
     # --------------------------------------------------------------------------------
     # isolate neurites and determine neurite length
 
-    neurites = neurites.isolate(neurites_raw, show)
-    neurite_length = neurites.get_length(neurites, show)
+    neurite_mask = neurites.isolate(neurites_raw, show)
+    neurite_length = neurites.get_length(neurite_mask, show)
 
     # --------------------------------------------------------------------------------
     # find synapse candidates and count
 
-    primary = isolate(primary_raw, neurites, range_synapse_size, minimum_synapse_brightness, show)
+    primary = isolate(primary_raw, neurite_mask,
+                      range_synapse_size, minimum_synapse_brightness, show)
     primary_count = _count_objects(primary)
 
     if secondary_synaptic_marker == None:
@@ -94,7 +96,7 @@ def count(neurite_marker,
             ax1.set_title('neurites')
 
             ax2 = fig.add_subplot(2,4,2)
-            ax2.imshow(neurites, cmap='gray')
+            ax2.imshow(neurite_mask, cmap='gray')
             ax2.set_title('neurite mask')
 
             ax3 = fig.add_subplot(2,4,5)
@@ -125,7 +127,8 @@ def count(neurite_marker,
         return primary_count, neurite_length
 
     else:
-        secondary = isolate(secondary_raw, neurites, range_synapse_size, minimum_synapse_brightness, show)
+        secondary = isolate(secondary_raw, neurite_mask,
+                            range_synapse_size, minimum_synapse_brightness, show)
         secondary_count = _count_objects(secondary)
 
         dual_labelled = _is_dual_labelled(primary, secondary, show)
@@ -149,7 +152,7 @@ def count(neurite_marker,
             ax1.set_title('neurites')
 
             ax2 = fig.add_subplot(3,4,2)
-            ax2.imshow(neurites, cmap='gray')
+            ax2.imshow(neurite_mask, cmap='gray')
             ax2.set_title('neurite mask')
 
             ax3 = fig.add_subplot(3,4,5)
@@ -183,7 +186,7 @@ def count(neurite_marker,
             ax1.set_title('primary & secondary synaptic marker')
 
             ax2.imshow(combined)
-            a2.set_title('neurites & isolated synapses')
+            ax2.set_title('neurites & isolated synapses')
 
             for ax in [ax1, ax2]:
                 ax.set_xticklabels([])
