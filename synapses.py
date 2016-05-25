@@ -83,31 +83,31 @@ def count(neurite_marker,
             combined = utils.grayscale_to_rgb(utils.rescale_0_255(neurites_raw))
             combined[np.where(primary)] = np.array([255, 0, 0])
 
-            fig = plt.figure()
-            ax1 = fig.add_subplot(2,4,1)
-            ax1.imshow(neurites_raw, cmap='gray')
-            ax1.set_title('neurites')
+            # fig = plt.figure()
+            # ax1 = fig.add_subplot(2,4,1)
+            # ax1.imshow(neurites_raw, cmap='gray')
+            # ax1.set_title('neurites')
 
-            ax2 = fig.add_subplot(2,4,2)
-            ax2.imshow(neurite_mask, cmap='gray')
-            ax2.set_title('neurite mask')
+            # ax2 = fig.add_subplot(2,4,2)
+            # ax2.imshow(neurite_mask, cmap='gray')
+            # ax2.set_title('neurite mask')
 
-            ax3 = fig.add_subplot(2,4,5)
-            ax3.imshow(primary_raw, cmap='gray')
-            ax3.set_title('primary synaptic marker')
+            # ax3 = fig.add_subplot(2,4,5)
+            # ax3.imshow(primary_raw, cmap='gray')
+            # ax3.set_title('primary synaptic marker')
 
-            ax4 = fig.add_subplot(2,4,6)
-            ax4.imshow(primary, cmap='gray')
-            ax4.set_title('isolated synapses')
+            # ax4 = fig.add_subplot(2,4,6)
+            # ax4.imshow(primary, cmap='gray')
+            # ax4.set_title('isolated synapses')
 
-            ax5 = fig.add_subplot(1,2,2)
-            ax5.imshow(combined, cmap='gray')
-            ax5.set_title('neurites & isolated synapses')
+            # ax5 = fig.add_subplot(1,2,2)
+            # ax5.imshow(combined, cmap='gray')
+            # ax5.set_title('neurites & isolated synapses')
 
-            for ax in [ax1, ax2, ax3, ax4, ax5]:
-                ax.set_xticklabels([])
-                ax.set_yticklabels([])
-            fig.tight_layout()
+            # for ax in [ax1, ax2, ax3, ax4, ax5]:
+            #     ax.set_xticklabels([])
+            #     ax.set_yticklabels([])
+            # fig.tight_layout()
 
             fig, (ax1, ax2) = plt.subplots(1,2)
             ax1.imshow(primary_raw, cmap='gray')
