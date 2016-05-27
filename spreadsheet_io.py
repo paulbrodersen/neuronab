@@ -1,40 +1,95 @@
 import numpy as np
 import pandas
 
-
-def apply_and_append(file_path_or_data_frame, func, return_identifiers, argument_identifiers=None):
+def apply_and_append(filepath_or_dataframe, func, arguments, returns):
     """
-    Reads in a spreadsheet / accepts a pandas data frame, interprets
-    groups specified in argument_identifiers as arguments to a
-    function func, and writes out the return values of func under the
-    groups in return_identifiers.
+    Reads in a spreadsheet / accepts a pandas data frame, loops over
+    rows, and interprets columns specified in 'arguments' as arguments
+    to a function 'func', and writes out the return values of 'func'
+    under the columns in 'returns'.
 
     Arguments:
     ----------
-        file_path_or_data_frame: str or pandas.DataFrame instance
+        filepath_or_dataframe: str or pandas.DataFrame instance
+            File path of data frame instance of a spreadsheet that specifies arguments for func.
         func: function handle
-        return_identifiers: [str, str, ..., str]
-        argument_identifiers: [str, str, ..., str] or None (default)
+            Function to loop over while passing arguments specified in the spreadsheet.
+        arguments: [str, str, ..., str]
+            Columns corresponding to the arguments of func.
+        returns: [str, str, ..., str]
+            Columns corresponding to the return values of func.
 
     Returns:
     --------
-        none_or_data_frame: None or pandas.DataFrame
+        none_or_dataframe: None or pandas.DataFrame
+            If a file path was supplied, results are saved in the same file
+            and the functions returns nothing.
+            If a data frame was supplied, the data frame is returned.
 
     """
-    return
+
+    # get data
+    if type(filepath_or_dataframe) == str:
+        df = _read(filepath_or_dataframe)
+    elif type(filepath_or_dataframe) == pandas.DataFrame:
+        df = filepath_or_dataframe
+    else:
+        raise ValueError("filepath_or_dataframe neither a string nor a pandas.DataFrame object!" + \
+                         "\ntype(filepath_or_dataframe) = {}".format(type(filepath_or_dataframe)))
+
+    # loop over rows
+    total_rows = df.shape[0]
+    for ii in range(total_rows):
+        # create dictionary
+        kwargs = _row_to_dict(df, ii, arguments)
+        # pass as key word arguments to function
+        return_values = func(**kwargs)
+        # save out to data frame
+        for col, val in zip(returns, return_values):
+            df.loc[ii, col] = val
+
+    # save out / return data frame
+    if type(filepath_or_dataframe) == str:
+        return _write(df, filepath_or_dataframe)
+    else:
+        return df
 
 def _read(file_path):
+    # parse file path to determine extension
+    extension = file_path.split('.')[-1]
 
-    return data_frame
+    # read
+    if extension in ('xls', 'xlsx'):
+        df = pandas.read_excel(file_path)
+    elif extension == 'csv':
+        df = pandas.read_csv(file_path)
+    else:
+        raise ValueError('Spread sheet needs to be a csv or excel (.xls, .xlsx) file! Extension of supplied file path is {}'.format(extension))
 
-def _write(data_frame, file_path):
+    return df
+
+def _write(df, file_path):
+    # parse file path to determine extension
+    extension = file_path.split('.')[-1]
+
+    # write
+    if extension in ('xls', 'xlsx'):
+        df.to_excel(file_path, index=False)
+    elif extension == 'csv':
+        df.to_csv(file_path, index=False)
+    else:
+        raise NotImplementedError
+
     return
 
-def _apply(data_frame, func, argument_identifiers=None):
-    return return_values
+def _row_to_dict(df, row, keys):
+    kv = []
+    for key in keys:
+        value = df.loc[row, key]
+        # check for nan
+        if type(value) == float: # need to check that type is float as np.isnan does not accept strings
+            if np.isnan(value):
+                continue # i.e. skip key, value pair
+        kv.append((key, value))
 
-def _append(groups, values, data_frame):
-    return data_frame
-
-def _data_frame_to_dicts(data_frame):
-    return dicts
+    return dict(kv)
