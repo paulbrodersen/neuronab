@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt; plt.ion(); plt.close('all')
+import matplotlib.pyplot as plt; # plt.ion(); plt.close('all')
 
 import scipy.ndimage
 import skimage.morphology
@@ -14,9 +14,11 @@ TITLE_FONT_SIZE = 'large'
 def count(neurite_marker,
           primary_synaptic_marker,
           secondary_synaptic_marker=None,
-          range_synapse_size=(16, 144),
-          minimum_synapse_brightness=97.5,
-          show=True):
+          min_synapse_size=16,
+          max_synapse_size=144,
+          min_synapse_brightness=97.5,
+          show=False,
+          save=None):
 
     """
     Arguments:
@@ -33,18 +35,27 @@ def count(neurite_marker,
             path to grayscale image of a secondary synaptic marker OR
             corresponding numpy array with values in the range (0-255)
 
-        range_synapse_size: 2-tuple of integers, default (16, 144)
-            range of acceptable synapse sizes in pixels
+        min_synapse_size: int
+            minimum acceptable synapse sizes in pixels
 
-        minimum_synapse_brightness: float in the range 0.-100., (default 97.5)
+        max_synapse_size: int
+            maximum acceptable synapse sizes in pixels
+
+        min_synapse_brightness: float in the range 0.-100., (default 97.5)
             image intensity threshold in percent above which objects
             in synaptic marker images are labelled as putative synapses
 
-        show: bool (default True)
+        show: bool (default False)
             if True, plots intermediate steps of image analysis
+
+        save: str (default None)
+    `      if not None (and show is True), figures will be saved under save+<integer>.pdf
 
     Returns:
     --------
+        neurite_length: int
+            total length of neurites in pixels
+
         primary_synaptic_marker_count: int
             number of synapses detected in image of primary synaptic marker
 
@@ -56,10 +67,9 @@ def count(neurite_marker,
             number of synapses detected in images of both synaptic markers;
             only returned if secondary_synaptic_marker is not None;
 
-        neurite_length: int
-            total length of neurites in pixels
-
     """
+    plt.ion()
+    plt.close('all')
 
     # manage input
     neurites_raw = utils.handle_grayscale_image_input(neurite_marker)
@@ -74,7 +84,7 @@ def count(neurite_marker,
 
     # find synapse candidates and count
     primary = isolate(primary_raw, neurite_mask,
-                      range_synapse_size, minimum_synapse_brightness, show)
+                      min_synapse_size, max_synapse_size, min_synapse_brightness, show)
     primary_count = _count_objects(primary)
 
     if secondary_synaptic_marker == None:
@@ -119,11 +129,17 @@ def count(neurite_marker,
                 ax.set_yticklabels([])
             fig.tight_layout()
 
-        return primary_count, neurite_length
+        if save != None:
+            for ii in plt.get_fignums():
+                plt.figure(ii)
+                plt.savefig(save + '_{}.pdf'.format(ii), dpi=300)
+
+        return neurite_length, primary_count
 
     else:
         secondary = isolate(secondary_raw, neurite_mask,
-                            range_synapse_size, minimum_synapse_brightness, show)
+                            min_synapse_size, max_synapse_size,
+                            min_synapse_brightness, show)
         secondary_count = _count_objects(secondary)
 
         dual_labelled = _is_dual_labelled(primary, secondary, show=False)
@@ -180,13 +196,19 @@ def count(neurite_marker,
                 ax.set_yticklabels([])
             fig.tight_layout()
 
-        return primary_count, secondary_count, dual_labelled_count, neurite_length
+        if save != None:
+            for ii in plt.get_fignums():
+                plt.figure(ii)
+                plt.savefig(save + '_{}.pdf'.format(ii), dpi=300)
+
+        return neurite_length, primary_count, secondary_count, dual_labelled_count
 
 def isolate(synaptic_marker,
             neurite_mask,
-            range_synapse_size=(16,144),
-            minimum_synapse_brightness=97.5,
-            show=True):
+            min_synapse_size=16,
+            max_synapse_size=144,
+            min_synapse_brightness=97.5,
+            show=False):
 
     """
     Arguments:
@@ -199,10 +221,13 @@ def isolate(synaptic_marker,
             path to binary image indicating the presence of neurites, OR
             corresponding boolean numpy.ndarray
 
-        range_synapse_size: 2-tuple of integers, default (9, 100)
-            range of acceptable synapse sizes in pixels
+        min_synapse_size: int
+            minimum acceptable synapse sizes in pixels
 
-        minimum_synapse_brightness: float in the range 0.-100., (default 95.)
+        max_synapse_size: int
+            maximum acceptable synapse sizes in pixels
+
+        min_synapse_brightness: float in the range 0.-100., (default 95.)
             image intensity threshold in percent above which objects
             in synaptic marker images are labelled as putative synapses
 
@@ -221,11 +246,11 @@ def isolate(synaptic_marker,
     neurite_mask = utils.handle_binary_image_input(neurite_mask)
 
     # threshold
-    thresholded = synapses_raw > np.percentile(synapses_raw, minimum_synapse_brightness)
+    thresholded = synapses_raw > np.percentile(synapses_raw, min_synapse_brightness)
 
     # remove too large objects, remove too small objects
-    cleaned = cleaning.remove_large_objects(thresholded, range_synapse_size[1]+1)
-    cleaned = cleaning.remove_small_objects(cleaned,     range_synapse_size[0]-1)
+    cleaned = cleaning.remove_large_objects(thresholded, max_synapse_size+1)
+    cleaned = cleaning.remove_small_objects(cleaned,     min_synapse_size-1)
 
     # restrict synapse candidates to puncta within or juxtaposed to the neurite mask;
     # dilate mask to catch synapses that are next to the neurite but not directly on it
