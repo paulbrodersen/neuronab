@@ -84,7 +84,7 @@ def isolate(neurite_marker, show):
 
     return neurite_mask
 
-def get_length(neurite_mask, show=True):
+def get_length(neurite_mask, show=False):
     """
     Arguments:
     ----------
@@ -141,7 +141,7 @@ def _connect_broken_lines(broken, show):
 # def test_isolate_neurites(paths):
 #     for path in paths:
 #         img = plt.imread(path)
-#         _isolate_neurites(img, show=True)
+#         _isolate_neurites(img, show=False)
 #     return
 
 # def test_connect_broken_lines(paths):
