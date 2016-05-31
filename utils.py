@@ -22,8 +22,8 @@ def grayscale_to_rgb(img):
     return np.tile(img, (3,1,1)).transpose([1,2,0]).astype(np.uint8)
 
 def handle_image_input(path_or_array):
-    assert type(path_or_array) in (str, np.ndarray), \
-        "Image not a path (i.e. a string) or a numpy array!"
+    assert isinstance(path_or_array, (str, np.ndarray)), \
+        "Image not a path (i.e. a string) or a numpy array! Currently, type(path_or_array) = {}.".format(path_or_array)
     if type(path_or_array) is str:
         img = plt.imread(path_or_array)
     else: # rename
@@ -33,7 +33,7 @@ def handle_image_input(path_or_array):
 def handle_grayscale_image_input(path_or_array):
     img = handle_image_input(path_or_array)
     assert np.ndim(img) == 2, \
-        "Dimensionality of image is not 2! Is it really a grayscale image and not an RGB or RGBA image?"
+        "Dimensionality of image is not 2! Is it really a grayscale image and not an RGB or RGBA image? Currently, ndim(img) = {}.".format(np.ndim(img))
     # if img.dtype != np.uint8:
     #     print Warning("Image not of type numpy.uint8. Casting to numpy.uint8 ...")
     #     img = img.astype(np.uint8)
@@ -42,13 +42,13 @@ def handle_grayscale_image_input(path_or_array):
 def handle_rgb_image_input(path_or_array):
     img = handle_image_input(path_or_array)
     assert np.ndim(img) in (3,4), \
-        "Dimensionality of image is not 3! Is it really an RGB or RGBA image and not a grayscale image?"
+        "Dimensionality of image is not 3! Is it really an RGB or RGBA image and not a grayscale image? Currently, ndim(img) = {}.".format(np.ndim(img))
     return img
 
 def handle_binary_image_input(path_or_array):
     img = handle_image_input(path_or_array)
     assert np.ndim(img) == 2, \
-        "Dimensionality of image is not 2! Is it really a binary image and not an RGB or RGBA image?"
+        "Dimensionality of image is not 2! Is it really a binary image and not an RGB or RGBA image? Currently, ndim(img) = {}.".format(np.ndim(img))
     if img.dtype != np.bool:
         print Warning("Image not of type numpy.bool. Casting to numpy.bool ...")
         img = img.astype(np.bool)
