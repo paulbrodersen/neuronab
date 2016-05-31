@@ -6,7 +6,7 @@ import skimage.morphology
 import skimage.transform
 import skimage.draw
 
-import phasepack; reload(phasepack)
+import phasepack.phasepack as pp; reload(pp)
 import cleaning; reload(cleaning)
 import utils; reload(utils)
 
@@ -34,15 +34,15 @@ def isolate(neurite_marker, show):
     raw = utils.handle_grayscale_image_input(neurite_marker)
 
     # determine local phase-symmetry -> maxima correspond to neurite
-    phase = phasepack.phasesym(raw,
-                               nscale=5,
-                               norient=3,
-                               minWaveLength=1,
-                               mult=2.1,
-                               sigmaOnf=0.55,
-                               k=1., # 5.,
-                               polarity=1,
-                               noiseMethod=-1)[0]
+    phase = pp.phasesym(raw,
+                        nscale=5,
+                        norient=3,
+                        minWaveLength=1,
+                        mult=2.1,
+                        sigmaOnf=0.55,
+                        k=1., # 5.,
+                        polarity=1,
+                        noiseMethod=-1)[0]
     phase = utils.rescale_0_255(phase)
 
     # morphological cleaning
