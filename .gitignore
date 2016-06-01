@@ -15,4 +15,7 @@
 !.gitkeep
 !*.tex
 !*.tif
+!*.xls
+!*.xlsx
+!*.csv
 
