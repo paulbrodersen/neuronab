@@ -132,7 +132,7 @@ def count(neurite_marker,
         if save != None:
             for ii in plt.get_fignums():
                 plt.figure(ii)
-                plt.savefig(save + '_{}.pdf'.format(ii), dpi=300)
+                plt.savefig(save + '{}.pdf'.format(ii), dpi=300)
 
         return neurite_length, primary_count
 
@@ -199,7 +199,7 @@ def count(neurite_marker,
         if save != None:
             for ii in plt.get_fignums():
                 plt.figure(ii)
-                plt.savefig(save + '_{}.pdf'.format(ii), dpi=300)
+                plt.savefig(save + '{}.pdf'.format(ii), dpi=300)
 
         return neurite_length, primary_count, secondary_count, dual_labelled_count
 
