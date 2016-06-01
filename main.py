@@ -23,3 +23,6 @@ def count_synapses(spreadsheet_path):
                  'dual_labelled']
     )
     return
+
+def test_count_synapses(spreadsheet_path="./test_images/template_linux.xlsx"):
+    return count_synapses(spreadsheet_path)
