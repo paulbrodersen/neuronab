@@ -22,9 +22,9 @@ def grayscale_to_rgb(img):
     return np.tile(img, (3,1,1)).transpose([1,2,0]).astype(np.uint8)
 
 def handle_image_input(path_or_array):
-    assert isinstance(path_or_array, (str, np.ndarray)), \
+    assert isinstance(path_or_array, (str, unicode, np.ndarray)), \
         "Image not a path (i.e. a string) or a numpy array! Currently, type(path_or_array) = {}.".format(type(path_or_array))
-    if type(path_or_array) is str:
+    if isinstance(path_or_array, (str, unicode)):
         img = plt.imread(path_or_array)
     else: # rename
         img = path_or_array
