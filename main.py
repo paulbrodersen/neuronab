@@ -8,7 +8,6 @@ import warnings
 
 if os.name in ('posix', 'mac'):
     test_spreadsheet_path = "./test_images/template_linux.xlsx"
-    test_spreadsheet_path = None
 elif os.name in ('nt'):
     test_spreadsheet_path = "./test_images/template_windows.xlsx"
 else:
