@@ -13,7 +13,7 @@ import utils; reload(utils)
 global TITLE_FONT_SIZE
 TITLE_FONT_SIZE = 'large'
 
-def isolate(neurite_marker, show):
+def isolate(neurite_marker, show=True, save=None):
     """
     Arguments:
     ----------
@@ -23,6 +23,9 @@ def isolate(neurite_marker, show):
 
         show: bool (default True)
             if True, plots intermediate steps of image analysis
+
+        save: str (default None)
+    `      if not None (and show is True), figures will be saved under save+<integer>.pdf
 
     Returns:
     --------
@@ -81,6 +84,9 @@ def isolate(neurite_marker, show):
             ax.set_yticklabels([])
 
         fig.tight_layout()
+
+        if save != None:
+            fig.savefig(save + '{}.pdf'.format(ii), dpi=300)
 
     return neurite_mask
 

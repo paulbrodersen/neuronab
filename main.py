@@ -26,3 +26,21 @@ def count_synapses(spreadsheet_path):
 
 def test_count_synapses(spreadsheet_path="./test_images/template_linux.xlsx"):
     return count_synapses(spreadsheet_path)
+
+def isolate_neurites(spreadsheet_path):
+    """
+    Script that runs neurites.isolate
+    using arguments supplied by spreadsheet at path.
+    """
+    spreadsheet_io.apply_and_append(
+        spreadsheet_path,
+        func=neurites.isolate,
+        arguments=['neurite_marker',
+                   'show',
+                   'save'],
+        returns=[]
+    )
+    return
+
+def test_isolate_neurites(spreadsheet_path="./test_images/template_linux.xlsx"):
+    return isolate_neurites(spreadsheet_path)
