@@ -25,7 +25,7 @@ def isolate(neurite_marker, show=True, save=None):
             if True, plots intermediate steps of image analysis
 
         save: str (default None)
-    `      if not None (and show is True), figures will be saved under save+<integer>.pdf
+    `      if not None (and show is True), figures will be saved under save+<1>.pdf
 
     Returns:
     --------
@@ -86,11 +86,11 @@ def isolate(neurite_marker, show=True, save=None):
         fig.tight_layout()
 
         if save != None:
-            fig.savefig(save + '{}.pdf'.format(ii), dpi=300)
+            fig.savefig(save + '{}.pdf'.format(1), dpi=300)
 
     return neurite_mask
 
-def get_length(neurite_mask, show=False):
+def get_length(neurite_mask, show=False, save=None):
     """
     Arguments:
     ----------
@@ -100,6 +100,9 @@ def get_length(neurite_mask, show=False):
 
         show: bool (default True)
             if True, plots intermediate steps of image analysis
+
+        save: str (default None)
+    `      if not None (and show is True), figures will be saved under save+<2>.pdf
 
     Returns:
     --------
@@ -125,6 +128,9 @@ def get_length(neurite_mask, show=False):
             ax.set_xticklabels([])
             ax.set_yticklabels([])
         fig.tight_layout()
+
+        if save != None:
+            fig.savefig(save + '{}.pdf'.format(2), dpi=300)
 
     return neurite_length
 
