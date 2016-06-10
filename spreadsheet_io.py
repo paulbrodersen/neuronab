@@ -25,6 +25,8 @@ def apply_and_append(filepath_or_dataframe, func, arguments, returns):
             Columns corresponding to the arguments of func.
         returns: [str, str, ..., str]
             Columns corresponding to the return values of func.
+            Provide an empty list if no return values should be saved,
+            or if the function does not return anything.
 
     Returns:
     --------
