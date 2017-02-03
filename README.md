@@ -3,6 +3,8 @@
 A python module that automatically isolates neurites and potential synapses
 on immunofluorescence images.
 
+![alt tag](./neuronab_example.png)
+
 ## Examples
 
 ``` python
@@ -27,7 +29,7 @@ synapse_mask = neuronab.synapses.isolate(synaptic_marker, neurite_mask,
 
 # you can compute properties of the isolated structures
 neurite_length = neuronab.neurites.get_length(neurite_mask) # in pixels
-synapse_count = neuronab.synapses.get_count(neurite_marker, synapse_marker) % in number of isolated objects
+synapse_count = neuronab.synapses.get_count(neurite_marker, synapse_marker) # in number of isolated objects
 
 # bulk processing of images is facilitated via a Excel/CSV spreadsheet interface;
 # arguments/returns corresponds to existing columns in the spreadsheet
@@ -49,9 +51,7 @@ neuronab.spreadsheet_io.apply_and_append(
              'dual_labelled']
 )
 
-# of the provided spreadsheet template is used, convenience functions can be used instead:
+# if the provided spreadsheet template is used, convenience functions can be called instead:
 neuronab.count_synapses(spreadsheet_path)
 
 ```
-
-![alt tag](./neuronab_example.png)
