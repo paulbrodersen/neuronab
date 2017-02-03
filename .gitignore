@@ -6,12 +6,14 @@
 
 # do not ignore
 !*.py
+!*.png
 !*.pyx
 !*.txt
 !*.c
 !.gitattributes
 !.gitignore
-!readme.md
+!README.md
+!LICENSE
 !.gitkeep
 !*.tex
 !*.tif
