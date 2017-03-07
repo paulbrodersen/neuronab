@@ -51,21 +51,32 @@ def isolate(neurite_marker, show=True, save=None):
     # morphological cleaning
     clean = cleaning.morphological_cleaning(phase, disk_size=1)
 
+    # get neurite skeleton
+    neurite_skeleton = _skeletonize(clean)
+
+    # connect isolated pieces by finding straight lines through them
+    connected = _connect_broken_lines(neurite_skeleton)
+
+    # using skeleton as a seed, reconstruct the cleaned phase image
+    reconstructed = _reconstruct(clean, connected)
+
     # threshold to binary mask
-    binary = clean > 0
+    binary = reconstructed > 0
 
-    # close image to connect isolated pieces of neurite
-    disk = skimage.morphology.disk(10)
-    closed = skimage.morphology.closing(binary, disk)
+    # # thicken neurites
+    # disk = skimage.morphology.disk(10)
+    # closed = skimage.morphology.closing(binary, disk)
 
-    # remove isolated blobs
-    neurite_mask = cleaning.remove_small_objects(closed, size_threshold=64)
+    # # remove isolated blobs
+    # neurite_mask = cleaning.remove_small_objects(closed, size_threshold=64)
+
+    neurite_mask = binary
 
     if show == True:
-        fig, axes = plt.subplots(2,2)
-        ax1, ax2, ax3, ax4 = axes.ravel()
+        fig, axes = plt.subplots(2,3)
+        ax1, ax2, ax3, ax4, ax5, ax6 = axes.ravel()
 
-        fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
+        # fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
 
         ax1.imshow(raw, cmap='gray')
         ax1.set_title('input image')
@@ -76,10 +87,16 @@ def isolate(neurite_marker, show=True, save=None):
         ax3.imshow(clean, cmap='gray')
         ax3.set_title('morphological cleaning')
 
-        ax4.imshow(neurite_mask, cmap='gray')
-        ax4.set_title('threshold & morphological closing')
+        ax4.imshow(connected, cmap='gray')
+        ax4.set_title('neurite skeleton')
 
-        for ax in [ax1, ax2, ax3, ax4]:
+        ax5.imshow(reconstructed, cmap='gray')
+        ax5.set_title('reconstruction')
+
+        ax6.imshow(neurite_mask, cmap='gray')
+        ax6.set_title('thresholded mask')
+
+        for ax in axes.ravel():
             ax.set_xticklabels([])
             ax.set_yticklabels([])
 
@@ -137,7 +154,7 @@ def get_length(neurite_mask, show=False, save=None):
 def _skeletonize(binary_image):
     return skimage.morphology.medial_axis(binary_image)
 
-def _connect_broken_lines(broken, show):
+def _connect_broken_lines(broken):
     lines = skimage.transform.probabilistic_hough_line(broken,
                                                        threshold=1,
                                                        line_length=30,
@@ -150,6 +167,36 @@ def _connect_broken_lines(broken, show):
 
     return connected
 
+def _reconstruct(neurites, skeleton, show=False):
+
+    # reconstruct neurites from the skeleton outwards;
+    # seed value for reconstruct cannot exceed the pixel value in the neurite image
+    seed = np.zeros_like(neurites)
+    seed[skeleton > 0] = neurites[skeleton > 0]
+    reconstructed = skimage.morphology.reconstruction(seed, neurites)
+
+    # use skeleton value in regions where the pixel value in the neurite image
+    # is smaller than in the skeleton image;
+    holes = np.zeros_like(neurites)
+    fill_value = np.median(neurites[neurites > 0])
+    holes[skeleton > neurites] = fill_value
+    combined = reconstructed + holes
+
+    if show:
+        fig, axes = plt.subplots(2,2)
+        axes = axes.ravel()
+        axes[0].imshow(neurites, cmap='gray')
+        axes[1].imshow(skeleton, cmap='gray')
+        axes[2].imshow(reconstructed, cmap='gray')
+        axes[3].imshow(combined, cmap='gray')
+
+        for ax in axes:
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+        fig.tight_layout()
+
+    return utils.rescale_0_255(combined)
+
 # def test_isolate_neurites(paths):
 #     for path in paths:
 #         img = plt.imread(path)
@@ -159,13 +206,15 @@ def _connect_broken_lines(broken, show):
 # def test_connect_broken_lines(paths):
 #     for path in paths:
 #         neurites_raw = plt.imread(path)
-#         neurites = _isolate_neurites(neurites_raw, show=False)
-#         neurite_skeleton = skeleton.skeletonize(neurites)
-#         connected = _connect_broken_lines(neurite_skeleton, show=False)
+#         neurites = isolate(neurites_raw, show=True)
+#         neurite_skeleton = _skeletonize(neurites)
+#         connected = _connect_broken_lines(neurite_skeleton)
 
-#         # 4) close image to connect isolated pieces of neurite
-#         disk = skimage.morphology.disk(2)
-#         closed = skimage.morphology.closing(connected > 0, disk)
+#         # # 4) close image to connect isolated pieces of neurite
+#         # disk = skimage.morphology.disk(2)
+#         # closed = skimage.morphology.closing(connected > 0, disk)
+
+#         closed = _reconstruct(neurites, connected, show=True)
 
 #         fig, axes = plt.subplots(2,2)
 #         axes = axes.ravel()
