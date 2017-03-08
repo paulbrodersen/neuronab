@@ -40,10 +40,10 @@ def isolate(neurite_marker, show=True, save=None):
     phase = pp.phasesym(raw,
                         nscale=5,
                         norient=3,
-                        minWaveLength=1,
-                        mult=2.1,
+                        minWaveLength=1.,
+                        mult=3.,
                         sigmaOnf=0.55,
-                        k=1., # 5.,
+                        k=1., # 1.,
                         polarity=1,
                         noiseMethod=-1)[0]
     phase = utils.rescale_0_255(phase)
@@ -59,10 +59,10 @@ def isolate(neurite_marker, show=True, save=None):
     clean = clean_1 + clean_2
 
     # get neurite skeleton
-    neurite_skeleton = _skeletonize(clean)
+    skeleton = _skeletonize(clean)
 
     # connect isolated pieces by finding straight lines through them
-    connected = _connect_broken_lines(neurite_skeleton)
+    connected = _connect_broken_lines(skeleton, threshold=1, line_length=30, line_gap=25)
 
     # using skeleton as a seed, reconstruct the cleaned phase image
     reconstructed = _reconstruct(clean, connected)
@@ -70,12 +70,12 @@ def isolate(neurite_marker, show=True, save=None):
     # threshold to binary mask
     binary = reconstructed > 0
 
-    # # thicken neurites
-    # disk = skimage.morphology.disk(10)
-    # closed = skimage.morphology.closing(binary, disk)
+    # # dilate neurites
+    # disk = skimage.morphology.disk(3)
+    # dilated = skimage.morphology.dilation(binary, disk)
 
     # # remove isolated blobs
-    # neurite_mask = cleaning.remove_small_objects(closed, size_threshold=64)
+    # neurite_mask = cleaning.remove_small_objects(dilated, size_threshold=64)
 
     neurite_mask = binary
 
@@ -83,25 +83,25 @@ def isolate(neurite_marker, show=True, save=None):
         fig, axes = plt.subplots(2,3)
         ax1, ax2, ax3, ax4, ax5, ax6 = axes.ravel()
 
-        # fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
+        fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
 
         ax1.imshow(raw, cmap='gray')
-        ax1.set_title('input image')
+        ax1.set_title('Input image')
 
         ax2.imshow(phase, cmap='gray')
-        ax2.set_title('phase symmetry')
+        ax2.set_title('Phase symmetry')
 
         ax3.imshow(clean, cmap='gray')
-        ax3.set_title('morphological cleaning')
+        ax3.set_title('Morphological cleaning')
 
         ax4.imshow(connected, cmap='gray')
-        ax4.set_title('neurite skeleton')
+        ax4.set_title('Hough line transform')
 
         ax5.imshow(reconstructed, cmap='gray')
-        ax5.set_title('reconstruction')
+        ax5.set_title('Reconstruction')
 
         ax6.imshow(neurite_mask, cmap='gray')
-        ax6.set_title('thresholded mask')
+        ax6.set_title('Thresholded')
 
         for ax in axes.ravel():
             ax.set_xticklabels([])
@@ -113,6 +113,7 @@ def isolate(neurite_marker, show=True, save=None):
             fig.savefig(save + '{}.pdf'.format(1), dpi=300)
 
     return neurite_mask
+    # return raw, phase, clean, connected, reconstructed, neurite_mask
 
 def get_length(neurite_mask, show=False, save=None):
     """
@@ -161,11 +162,11 @@ def get_length(neurite_mask, show=False, save=None):
 def _skeletonize(binary_image):
     return skimage.morphology.medial_axis(binary_image)
 
-def _connect_broken_lines(broken):
+def _connect_broken_lines(broken, threshold=1, line_length=30, line_gap=20):
     lines = skimage.transform.probabilistic_hough_line(broken,
-                                                       threshold=1,
-                                                       line_length=30,
-                                                       line_gap=20)
+                                                       threshold,
+                                                       line_length,
+                                                       line_gap)
     connected = np.zeros_like(broken, dtype=np.uint8)
     for line in lines:
         p0, p1 = line
@@ -180,6 +181,8 @@ def _reconstruct(neurites, skeleton, show=False):
     # seed value for reconstruct cannot exceed the pixel value in the neurite image
     seed = np.zeros_like(neurites)
     seed[skeleton > 0] = neurites[skeleton > 0]
+
+    disk = skimage.morphology.disk(2)
     reconstructed = skimage.morphology.reconstruction(seed, neurites)
 
     # use skeleton value in regions where the pixel value in the neurite image

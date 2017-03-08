@@ -261,7 +261,7 @@ def isolate(synaptic_marker,
         cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
 
         images = [synapses_raw, thresholded, cleaned, synapse_mask]
-        titles = ['input image', 'thresholded', 'within size range', 'within neurite mask']
+        titles = ['Input image', 'Thresholded', 'Within size range', 'Within neurite mask']
 
         fig, axes = plt.subplots(2,2)
         fig.suptitle('Synapse isolation', fontsize=TITLE_FONT_SIZE)
@@ -271,6 +271,7 @@ def isolate(synaptic_marker,
             ax.set_xticklabels([])
             ax.set_yticklabels([])
         fig.tight_layout()
+        fig.subplots_adjust(top=0.85)
 
     return synapse_mask
 
