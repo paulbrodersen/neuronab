@@ -1,10 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt; plt.ion(); plt.close('all')
+import matplotlib.pyplot as plt; plt.ion(); # plt.close('all')
 
 import scipy.ndimage
 import skimage.morphology
-import skimage.transform
-import skimage.draw
+
+from skimage import draw
+from skimage.filters import rank
+from skimage.transform import probabilistic_hough_line
 
 import phasepack.phasepack as pp; reload(pp)
 import cleaning; reload(cleaning)
@@ -48,12 +50,10 @@ def isolate(neurite_marker, show=True, save=None):
                         noiseMethod=-1)[0]
     phase = utils.rescale_0_255(phase)
 
-    # morphological cleaning
-    # selem = skimage.morphology.square(3)
-    # selem = skimage.morphology.disk(1)
+    # morphological cleaning using 1-connectivity;
+    # combine vertical/horizontal cross with diagonal cross
     selem = np.array([[1,0,1],[0,1,0],[1,0,1]])
     clean_1 = cleaning.morphological_cleaning(phase, selem)
-
     selem = np.array([[0,1,0],[1,1,1],[0,1,0]])
     clean_2 = cleaning.morphological_cleaning(phase, selem)
     clean = clean_1 + clean_2
@@ -80,11 +80,12 @@ def isolate(neurite_marker, show=True, save=None):
     neurite_mask = binary
 
     if show == True:
-        fig, axes = plt.subplots(2,3)
-        ax1, ax2, ax3, ax4, ax5, ax6 = axes.ravel()
+        images = [raw, equalised, phase, clean, connected, neurite_mask]
+        titles = ['Input image', 'Local histogram equalisation', 'Phase symmetry',
+                  'Morphological cleaning', 'Hough line transform', 'Thresholded and closed']
 
+        fig, axes = plt.subplots(2,3,sharex=True,sharey=True)
         fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
-
         ax1.imshow(raw, cmap='gray')
         ax1.set_title('Input image')
 
@@ -163,14 +164,14 @@ def _skeletonize(binary_image):
     return skimage.morphology.medial_axis(binary_image)
 
 def _connect_broken_lines(broken, threshold=1, line_length=30, line_gap=20):
-    lines = skimage.transform.probabilistic_hough_line(broken,
-                                                       threshold,
-                                                       line_length,
-                                                       line_gap)
+    lines = probabilistic_hough_line(broken,
+                                     threshold,
+                                     line_length,
+                                     line_gap)
     connected = np.zeros_like(broken, dtype=np.uint8)
     for line in lines:
         p0, p1 = line
-        rr, cc = skimage.draw.line(p0[1], p0[0], p1[1], p1[0])
+        rr, cc = draw.line(p0[1], p0[0], p1[1], p1[0])
         connected[rr, cc] += 1
 
     return connected
