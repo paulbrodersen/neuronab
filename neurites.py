@@ -93,25 +93,10 @@ def isolate(neurite_marker, show=True, save=None):
 
         fig, axes = plt.subplots(2,3,sharex=True,sharey=True)
         fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
-        ax1.imshow(raw, cmap='gray')
-        ax1.set_title('Input image')
-
-        ax2.imshow(phase, cmap='gray')
-        ax2.set_title('Phase symmetry')
-
-        ax3.imshow(clean, cmap='gray')
-        ax3.set_title('Morphological cleaning')
-
-        ax4.imshow(connected, cmap='gray')
-        ax4.set_title('Hough line transform')
-
-        ax5.imshow(reconstructed, cmap='gray')
-        ax5.set_title('Reconstruction')
-
-        ax6.imshow(neurite_mask, cmap='gray')
-        ax6.set_title('Thresholded')
-
-        for ax in axes.ravel():
+        for img, ax, title in zip(images, axes.ravel(), titles):
+            ax.imshow(img, cmap='gray', interpolation='nearest')
+            ax.set_title(title)
+            ax.set_adjustable('box-forced')
             ax.set_xticklabels([])
             ax.set_yticklabels([])
 
