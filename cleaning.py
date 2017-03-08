@@ -21,11 +21,12 @@ def remove_large_objects(binary_img, size_threshold=100):
     clean = mask_sizes[label_objects]
     return clean
 
-def morphological_cleaning(img, disk_size=2):
-    disk = sm.disk(disk_size)
-    eroded = sm.erosion(img, disk)
+# def morphological_cleaning(img, disk):
+def morphological_cleaning(img, selem):
+    # disk = sm.disk(disk_size)
+    eroded = sm.erosion(img, selem)
     reconstructed = sm.reconstruction(eroded, img)
-    dilated = sm.dilation(reconstructed, disk)
+    dilated = sm.dilation(reconstructed, selem)
     clean_complement = sm.reconstruction(imcomplement(dilated), imcomplement(reconstructed))
     clean = imcomplement(clean_complement)
     return rescale_0_255(clean)
