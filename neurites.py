@@ -38,10 +38,14 @@ def isolate(neurite_marker, show=True, save=None):
     # handle input
     raw = utils.handle_grayscale_image_input(neurite_marker)
 
+    selem = skimage.morphology.disk(50)
+    equalised = rank.equalize(raw, selem=selem)
+
     # determine local phase-symmetry -> maxima correspond to neurite
-    phase = pp.phasesym(raw,
+    phase = pp.phasesym(equalised,
                         nscale=5,
                         norient=3,
+                        # minWaveLength=0.33,
                         minWaveLength=1.,
                         mult=3.,
                         sigmaOnf=0.55,
@@ -58,26 +62,29 @@ def isolate(neurite_marker, show=True, save=None):
     clean_2 = cleaning.morphological_cleaning(phase, selem)
     clean = clean_1 + clean_2
 
+    # remove dark objects -- removes too much
+    # threshold = np.percentile(clean[clean > 0], 25)
+    # clean[clean < threshold] = 0
+
     # get neurite skeleton
     skeleton = _skeletonize(clean)
 
     # connect isolated pieces by finding straight lines through them
-    connected = _connect_broken_lines(skeleton, threshold=1, line_length=30, line_gap=25)
+    # connected = _connect_broken_lines(skeleton, threshold=1, line_length=30, line_gap=25)
+    connected = _connect_broken_lines(skeleton, threshold=1, line_length=50, line_gap=25)
 
-    # using skeleton as a seed, reconstruct the cleaned phase image
+    # using skeleton as a seed, reconstruct the cleaned phase image -- doesn't do much yet
     reconstructed = _reconstruct(clean, connected)
 
     # threshold to binary mask
     binary = reconstructed > 0
 
-    # # dilate neurites
-    # disk = skimage.morphology.disk(3)
-    # dilated = skimage.morphology.dilation(binary, disk)
+    # close elements
+    disk = skimage.morphology.disk(3)
+    closed = skimage.morphology.closing(binary, disk)
 
-    # # remove isolated blobs
-    # neurite_mask = cleaning.remove_small_objects(dilated, size_threshold=64)
-
-    neurite_mask = binary
+    # remove isolated blobs
+    neurite_mask = cleaning.remove_small_objects(closed, size_threshold=100)
 
     if show == True:
         images = [raw, equalised, phase, clean, connected, neurite_mask]
