@@ -49,7 +49,14 @@ def isolate(neurite_marker, show=True, save=None):
     phase = utils.rescale_0_255(phase)
 
     # morphological cleaning
-    clean = cleaning.morphological_cleaning(phase, disk_size=1)
+    # selem = skimage.morphology.square(3)
+    # selem = skimage.morphology.disk(1)
+    selem = np.array([[1,0,1],[0,1,0],[1,0,1]])
+    clean_1 = cleaning.morphological_cleaning(phase, selem)
+
+    selem = np.array([[0,1,0],[1,1,1],[0,1,0]])
+    clean_2 = cleaning.morphological_cleaning(phase, selem)
+    clean = clean_1 + clean_2
 
     # get neurite skeleton
     neurite_skeleton = _skeletonize(clean)
