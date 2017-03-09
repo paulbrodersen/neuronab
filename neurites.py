@@ -92,7 +92,7 @@ def isolate(neurite_marker, show=True, save=None):
                   'Morphological cleaning', 'Hough line transform', 'Reconstruction and thresholded']
 
         fig, axes = plt.subplots(2,3,sharex=True,sharey=True)
-        fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
+        # fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
         for img, ax, title in zip(images, axes.ravel(), titles):
             ax.imshow(img, cmap='gray', interpolation='nearest')
             ax.set_title(title)
