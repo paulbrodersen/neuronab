@@ -261,7 +261,7 @@ def isolate(synaptic_marker,
         cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
 
         images = [synapses_raw, thresholded, cleaned, synapse_mask]
-        titles = ['Input image', 'Thresholded', 'Within size range', 'Within neurite mask']
+        titles = ['Synaptic marker', 'Thresholded', 'Within size range', 'Within neurite mask']
 
         fig, axes = plt.subplots(2,2)
         fig.suptitle('Synapse isolation', fontsize=TITLE_FONT_SIZE)

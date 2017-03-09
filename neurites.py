@@ -73,7 +73,7 @@ def isolate(neurite_marker, show=True, save=None):
     # connected = _connect_broken_lines(skeleton, threshold=1, line_length=30, line_gap=25)
     connected = _connect_broken_lines(skeleton, threshold=1, line_length=50, line_gap=25)
 
-    # using skeleton as a seed, reconstruct the cleaned phase image -- doesn't do much yet
+    # using skeleton as a seed, reconstruct the cleaned phase image
     reconstructed = _reconstruct(clean, connected)
 
     # threshold to binary mask
@@ -88,8 +88,8 @@ def isolate(neurite_marker, show=True, save=None):
 
     if show == True:
         images = [raw, equalised, phase, clean, connected, neurite_mask]
-        titles = ['Input image', 'Local histogram equalisation', 'Phase symmetry',
-                  'Morphological cleaning', 'Hough line transform', 'Thresholded and closed']
+        titles = ['Neurite marker', 'Local histogram equalisation', 'Phase symmetry',
+                  'Morphological cleaning', 'Hough line transform', 'Reconstruction and thresholded']
 
         fig, axes = plt.subplots(2,3,sharex=True,sharey=True)
         fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)

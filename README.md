@@ -1,9 +1,15 @@
 # neuronab
 
-A python module that automatically isolates neurites and potential synapses
-on immunofluorescence images.
+A python module that automatically identifies neuronal structures in immunofluorescence images.
+Two functions are implemented at the moment:
 
-![alt tag](./neuronab_example.png)
+1) Neurite isolation:
+
+![alt tag](./neurite_isolation.png)
+
+2) Synapse detection
+
+![alt tag](./synapse_detection.png)
 
 ## Examples
 
