@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt; # plt.ion(); plt.close('all')
 import scipy.ndimage
 import skimage.morphology
 
-import cleaning; reload(cleaning)
-import utils; reload(utils)
-import neurites; reload(neurites)
+import cleaning
+import utils
+import neurites
 
 global TITLE_FONT_SIZE
 TITLE_FONT_SIZE = 'large'

@@ -1,10 +1,10 @@
-import spreadsheet_io; reload(spreadsheet_io)
-import synapses; reload(synapses)
-import neurites; reload(neurites)
-
 import os
 import os.path
 import warnings
+
+import spreadsheet_io
+import synapses
+import neurites
 
 if os.name in ('posix', 'mac'):
     test_spreadsheet_path = "./test_images/template_linux.xlsx"
@@ -12,16 +12,16 @@ elif os.name in ('nt'):
     test_spreadsheet_path = "./test_images/template_windows.xlsx"
 else:
     test_spreadsheet_path = None
-    warning.warn("Could not detect operating system automatically. " + \
-                 "Automatic tests won't run without user input.")
+    warnings.warn("Could not detect operating system automatically. " + \
+                  "Automatic tests won't run without user input.")
 
 def prompt_for_existing_path(msg):
     valid = False
     attempt = 0
     while not valid:
         if attempt > 0:
-            print "Path does not exist!"
-        path = raw_input(msg)
+            print("Path does not exist!")
+        path = input(msg)
         valid = os.path.exists(path)
         attempt += 1
     return path

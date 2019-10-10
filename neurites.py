@@ -8,9 +8,9 @@ from skimage import draw
 from skimage.filters import rank
 from skimage.transform import probabilistic_hough_line
 
-import phasepack.phasepack as pp; reload(pp)
-import cleaning; reload(cleaning)
-import utils; reload(utils)
+import phasepack.phasepack as pp
+import cleaning
+import utils
 
 global TITLE_FONT_SIZE
 TITLE_FONT_SIZE = 'large'
@@ -96,7 +96,7 @@ def isolate(neurite_marker, show=True, save=None):
         for img, ax, title in zip(images, axes.ravel(), titles):
             ax.imshow(img, cmap='gray', interpolation='nearest')
             ax.set_title(title)
-            ax.set_adjustable('box-forced')
+            ax.set_adjustable('box')
             ax.set_xticklabels([])
             ax.set_yticklabels([])
 

@@ -66,7 +66,7 @@ def apply_and_append(filepath_or_dataframe, func, arguments, returns):
             df.loc[ii, col] = val
 
     # save out / return data frame
-    if isinstance(filepath_or_dataframe, (str, unicode)):
+    if isinstance(filepath_or_dataframe, str):
         return _write(df, filepath_or_dataframe)
     else:
         return df
