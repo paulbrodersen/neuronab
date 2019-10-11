@@ -176,8 +176,6 @@ def _reconstruct(neurites, skeleton, show=False):
     # seed value for reconstruct cannot exceed the pixel value in the neurite image
     seed = np.zeros_like(neurites)
     seed[skeleton > 0] = neurites[skeleton > 0]
-
-    disk = skimage.morphology.disk(2)
     reconstructed = skimage.morphology.reconstruction(seed, neurites)
 
     # use skeleton value in regions where the pixel value in the neurite image
