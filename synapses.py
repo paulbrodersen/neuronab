@@ -10,6 +10,78 @@ import cleaning
 import utils
 import neurites
 
+
+def isolate(synaptic_marker,
+            neurite_mask,
+            min_synapse_size=16,
+            max_synapse_size=144,
+            min_synapse_brightness=97.5,
+            show=False):
+
+    """
+    Arguments:
+    ----------
+        synaptic_marker: string or numpy.uint8 array
+            path to grayscale image of synaptic marker, OR
+            corresponding numpy array with values in the range (0-255)
+
+        neurite_mask: string or numpy.bool array
+            path to binary image indicating the presence of neurites, OR
+            corresponding boolean numpy.ndarray
+
+        min_synapse_size: int
+            minimum acceptable synapse sizes in pixels
+
+        max_synapse_size: int
+            maximum acceptable synapse sizes in pixels
+
+        min_synapse_brightness: float in the range 0.-100., (default 95.)
+            image intensity threshold in percent above which objects
+            in synaptic marker images are labelled as putative synapses
+
+        show: bool (default True)
+            if True, plots intermediate steps of image analysis
+
+    Returns:
+    --------
+        synapse_mask: numpy.bool array
+            binary image indicating the presence of a synapse
+
+    """
+
+    # handle input
+    synapses_raw = utils.handle_grayscale_image_input(synaptic_marker)
+    neurite_mask = utils.handle_binary_image_input(neurite_mask)
+
+    # threshold
+    thresholded = synapses_raw > np.percentile(synapses_raw, min_synapse_brightness)
+
+    # remove too large objects, remove too small objects
+    cleaned = cleaning.remove_large_objects(thresholded, max_synapse_size+1)
+    cleaned = cleaning.remove_small_objects(cleaned,     min_synapse_size-1)
+
+    # restrict synapse candidates to puncta within or juxtaposed to the neurite mask;
+    # dilate mask to catch synapses that are next to the neurite but not directly on it
+    dilated = skimage.morphology.binary_dilation(neurite_mask, skimage.morphology.disk(2))
+    synapse_mask = np.logical_and(cleaned, dilated)
+
+    if show:
+        cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
+
+        images = [synapses_raw, thresholded, cleaned, synapse_mask]
+        titles = ['Synaptic marker', 'Thresholded', 'Within size range', 'Within neurite mask']
+
+        fig, axes = plt.subplots(2,2)
+        for img, ax, title in zip(images, axes.ravel(), titles):
+            ax.imshow(img, cmap='gray')
+            ax.set_title(title)
+            utils.remove_ticks(ax)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.85)
+
+    return synapse_mask
+
+
 def count(neurite_marker,
           primary_synaptic_marker,
           secondary_synaptic_marker=None,
@@ -125,78 +197,6 @@ def count(neurite_marker,
                 plt.savefig(save + '{}.pdf'.format(ii), dpi=300)
 
         return neurite_length, primary_count, secondary_count, dual_labelled_count
-
-
-def isolate(synaptic_marker,
-            neurite_mask,
-            min_synapse_size=16,
-            max_synapse_size=144,
-            min_synapse_brightness=97.5,
-            show=False):
-
-    """
-    Arguments:
-    ----------
-        synaptic_marker: string or numpy.uint8 array
-            path to grayscale image of synaptic marker, OR
-            corresponding numpy array with values in the range (0-255)
-
-        neurite_mask: string or numpy.bool array
-            path to binary image indicating the presence of neurites, OR
-            corresponding boolean numpy.ndarray
-
-        min_synapse_size: int
-            minimum acceptable synapse sizes in pixels
-
-        max_synapse_size: int
-            maximum acceptable synapse sizes in pixels
-
-        min_synapse_brightness: float in the range 0.-100., (default 95.)
-            image intensity threshold in percent above which objects
-            in synaptic marker images are labelled as putative synapses
-
-        show: bool (default True)
-            if True, plots intermediate steps of image analysis
-
-    Returns:
-    --------
-        synapse_mask: numpy.bool array
-            binary image indicating the presence of a synapse
-
-    """
-
-    # handle input
-    synapses_raw = utils.handle_grayscale_image_input(synaptic_marker)
-    neurite_mask = utils.handle_binary_image_input(neurite_mask)
-
-    # threshold
-    thresholded = synapses_raw > np.percentile(synapses_raw, min_synapse_brightness)
-
-    # remove too large objects, remove too small objects
-    cleaned = cleaning.remove_large_objects(thresholded, max_synapse_size+1)
-    cleaned = cleaning.remove_small_objects(cleaned,     min_synapse_size-1)
-
-    # restrict synapse candidates to puncta within or juxtaposed to the neurite mask;
-    # dilate mask to catch synapses that are next to the neurite but not directly on it
-    dilated = skimage.morphology.binary_dilation(neurite_mask, skimage.morphology.disk(2))
-    synapse_mask = np.logical_and(cleaned, dilated)
-
-    if show:
-        cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
-
-        images = [synapses_raw, thresholded, cleaned, synapse_mask]
-        titles = ['Synaptic marker', 'Thresholded', 'Within size range', 'Within neurite mask']
-
-        fig, axes = plt.subplots(2,2)
-        for img, ax, title in zip(images, axes.ravel(), titles):
-            ax.imshow(img, cmap='gray')
-            ax.set_title(title)
-            ax.set_xticklabels([])
-            ax.set_yticklabels([])
-        fig.tight_layout()
-        fig.subplots_adjust(top=0.85)
-
-    return synapse_mask
 
 
 def _count_objects(binary_mask):
