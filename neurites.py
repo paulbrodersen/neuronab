@@ -62,15 +62,10 @@ def isolate(neurite_marker, show=True, save=None):
     clean_2 = cleaning.morphological_cleaning(phase, selem)
     clean = clean_1 + clean_2
 
-    # remove dark objects -- removes too much
-    # threshold = np.percentile(clean[clean > 0], 25)
-    # clean[clean < threshold] = 0
-
     # get neurite skeleton
     skeleton = _skeletonize(clean)
 
     # connect isolated pieces by finding straight lines through them
-    # connected = _connect_broken_lines(skeleton, threshold=1, line_length=30, line_gap=25)
     connected = _connect_broken_lines(skeleton, threshold=1, line_length=50, line_gap=25)
 
     # using skeleton as a seed, reconstruct the cleaned phase image
