@@ -51,8 +51,11 @@ def isolate(neurite_marker, show=True, save=None):
                         noiseMethod   = -1)[0]
     phase = utils.rescale_0_255(phase)
 
-    # morphological cleaning using 1-connectivity;
-    # combine vertical/horizontal cross with diagonal cross
+    # Morphological cleaning using 1-connectivity:
+    # clean with a vertical/horizontal and diagonal cross individually,
+    # and then combine the results.
+    # This leverages the elongated nature of the neurites.
+    # Use the combination of both crosses (i.e. a square) yields inferior results.
     selem = np.array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
     clean_1 = cleaning.morphological_cleaning(phase, selem)
     selem = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
