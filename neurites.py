@@ -41,15 +41,14 @@ def isolate(neurite_marker, show=True, save=None):
 
     # determine local phase-symmetry -> maxima correspond to neurite
     phase = pp.phasesym(equalised,
-                        nscale=5,
-                        norient=3,
-                        # minWaveLength=0.33,
-                        minWaveLength=1.,
-                        mult=3.,
-                        sigmaOnf=0.55,
-                        k=1., # 1.,
-                        polarity=1,
-                        noiseMethod=-1)[0]
+                        nscale        = 5,
+                        norient       = 3,
+                        minWaveLength = 1.,
+                        mult          = 3.,
+                        sigmaOnf      = 0.55,
+                        k             = 1.,
+                        polarity      = 1,
+                        noiseMethod   = -1)[0]
     phase = utils.rescale_0_255(phase)
 
     # morphological cleaning using 1-connectivity;
