@@ -13,9 +13,6 @@ import phasepack.phasepack as pp
 import cleaning
 import utils
 
-global TITLE_FONT_SIZE
-TITLE_FONT_SIZE = 'large'
-
 def isolate(neurite_marker, show=True, save=None):
     """
     Arguments:

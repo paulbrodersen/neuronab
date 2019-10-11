@@ -10,9 +10,6 @@ import cleaning
 import utils
 import neurites
 
-global TITLE_FONT_SIZE
-TITLE_FONT_SIZE = 'large'
-
 def count(neurite_marker,
           primary_synaptic_marker,
           secondary_synaptic_marker=None,
