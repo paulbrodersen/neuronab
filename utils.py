@@ -51,3 +51,15 @@ def handle_binary_image_input(path_or_array):
         warnings.warn("Image not of type numpy.bool. Casting to numpy.bool ...")
         img = img.astype(np.bool)
     return img
+
+def remove_ticks(ax):
+    ax.tick_params(
+        axis        = 'both',
+        which       = 'both',
+        bottom      = False,
+        top         = False,
+        right       = False,
+        left        = False,
+        labelbottom = False,
+        labelleft   = False,
+    )

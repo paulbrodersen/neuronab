@@ -97,10 +97,7 @@ def isolate(neurite_marker, show=True, save=None):
     if show:
             ax.imshow(img, cmap='gray', interpolation='nearest')
             ax.set_title(title)
-            ax.set_adjustable('box')
-            ax.set_xticklabels([])
-            ax.set_yticklabels([])
-
+            utils.remove_ticks(ax)
         fig.tight_layout()
 
         if save != None:
@@ -192,10 +189,8 @@ def _reconstruct(neurites, skeleton, show=False):
         axes[1].imshow(skeleton, cmap='gray')
         axes[2].imshow(reconstructed, cmap='gray')
         axes[3].imshow(combined, cmap='gray')
+            utils.remove_ticks(ax)
 
-        for ax in axes:
-            ax.set_xticklabels([])
-            ax.set_yticklabels([])
         fig.tight_layout()
 
     return utils.rescale_0_255(combined)
