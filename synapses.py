@@ -70,13 +70,7 @@ def isolate(synaptic_marker,
 
         images = [synapses_raw, thresholded, cleaned, synapse_mask]
         titles = ['Synaptic marker', 'Thresholded', 'Within size range', 'Within neurite mask']
-
-        fig, axes = plt.subplots(2,2)
-        for img, ax, title in zip(images, axes.ravel(), titles):
-            ax.imshow(img, cmap='gray')
-            ax.set_title(title)
-            utils.remove_ticks(ax)
-        fig.tight_layout()
+        fig = utils.plot_image_collection(images, titles, nrows=2, ncols=2)
         fig.subplots_adjust(top=0.85)
 
     return synapse_mask
@@ -164,7 +158,7 @@ def count(neurite_marker,
 
             images = [primary_raw, combined]
             titles = ['Primary synaptic marker', 'Neurites & isolate synapses']
-            fig = utils.plot_image_collection(images, titles, cmap=None, nrows=1, ncols=2)
+            fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
 
         if save != None:
             for ii in plt.get_fignums():
