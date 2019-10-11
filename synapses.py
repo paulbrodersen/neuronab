@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 import matplotlib.pyplot as plt; # plt.ion(); plt.close('all')
 
@@ -87,9 +89,9 @@ def count(neurite_marker,
                       min_synapse_size, max_synapse_size, min_synapse_brightness, show)
     primary_count = _count_objects(primary)
 
-    if secondary_synaptic_marker == None:
+    if secondary_synaptic_marker is None:
 
-        if show == True:
+        if show:
             combined = utils.grayscale_to_rgb(utils.rescale_0_255(neurites_raw))
             combined[np.where(primary)] = np.array([255, 0, 0])
 
@@ -145,7 +147,7 @@ def count(neurite_marker,
         dual_labelled = _is_dual_labelled(primary, secondary, show=False)
         dual_labelled_count = _count_objects(dual_labelled)
 
-        if show == True:
+        if show:
             combined = utils.grayscale_to_rgb(utils.rescale_0_255(neurites_raw))
             combined[np.where(primary)] = np.array([255, 0, 0])
             combined[np.where(secondary)] = np.array([0, 255, 0])
@@ -203,6 +205,7 @@ def count(neurite_marker,
 
         return neurite_length, primary_count, secondary_count, dual_labelled_count
 
+
 def isolate(synaptic_marker,
             neurite_mask,
             min_synapse_size=16,
@@ -257,7 +260,7 @@ def isolate(synaptic_marker,
     dilated = skimage.morphology.binary_dilation(neurite_mask, skimage.morphology.disk(2))
     synapse_mask = np.logical_and(cleaned, dilated)
 
-    if show == True:
+    if show:
         cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
 
         images = [synapses_raw, thresholded, cleaned, synapse_mask]
@@ -275,10 +278,12 @@ def isolate(synaptic_marker,
 
     return synapse_mask
 
+
 def _count_objects(binary_mask):
     label_objects, nb_labels = scipy.ndimage.label(binary_mask)
     count = label_objects.max()
     return count
+
 
 def _is_dual_labelled(primary, secondary, show):
     dual_labelled = np.logical_and(primary, secondary)

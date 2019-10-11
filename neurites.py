@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+
 import numpy as np
 import matplotlib.pyplot as plt; plt.ion(); # plt.close('all')
 
-import scipy.ndimage
 import skimage.morphology
 
 from skimage import draw
@@ -56,9 +57,9 @@ def isolate(neurite_marker, show=True, save=None):
 
     # morphological cleaning using 1-connectivity;
     # combine vertical/horizontal cross with diagonal cross
-    selem = np.array([[1,0,1],[0,1,0],[1,0,1]])
+    selem = np.array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
     clean_1 = cleaning.morphological_cleaning(phase, selem)
-    selem = np.array([[0,1,0],[1,1,1],[0,1,0]])
+    selem = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
     clean_2 = cleaning.morphological_cleaning(phase, selem)
     clean = clean_1 + clean_2
 
@@ -86,7 +87,6 @@ def isolate(neurite_marker, show=True, save=None):
     # remove isolated blobs
     neurite_mask = cleaning.remove_small_objects(closed, size_threshold=100)
 
-    if show == True:
         images = [raw, equalised, phase, clean, connected, neurite_mask]
         titles = ['Neurite marker', 'Local histogram equalisation', 'Phase symmetry',
                   'Morphological cleaning', 'Hough line transform', 'Reconstruction and thresholded']
@@ -94,6 +94,7 @@ def isolate(neurite_marker, show=True, save=None):
         fig, axes = plt.subplots(2,3,sharex=True,sharey=True)
         # fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
         for img, ax, title in zip(images, axes.ravel(), titles):
+    if show:
             ax.imshow(img, cmap='gray', interpolation='nearest')
             ax.set_title(title)
             ax.set_adjustable('box')
@@ -155,6 +156,7 @@ def get_length(neurite_mask, show=False, save=None):
 def _skeletonize(binary_image):
     return skimage.morphology.medial_axis(binary_image)
 
+
 def _connect_broken_lines(broken, threshold=1, line_length=30, line_gap=20):
     lines = probabilistic_hough_line(broken,
                                      threshold,
@@ -167,6 +169,7 @@ def _connect_broken_lines(broken, threshold=1, line_length=30, line_gap=20):
         connected[rr, cc] += 1
 
     return connected
+
 
 def _reconstruct(neurites, skeleton, show=False):
 
