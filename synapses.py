@@ -282,7 +282,7 @@ def _count_objects(binary_mask):
 def _is_dual_labelled(primary, secondary, show):
     dual_labelled = np.logical_and(primary, secondary)
 
-    if show == True:
+    if show:
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         ax1.imshow(primary, cmap='gray')
         ax1.set_title('primary marker')
