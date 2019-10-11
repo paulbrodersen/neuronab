@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-import matplotlib.pyplot as plt; plt.ion(); # plt.close('all')
+import matplotlib.pyplot as plt
 
 import skimage.morphology
 
