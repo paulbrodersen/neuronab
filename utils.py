@@ -52,7 +52,16 @@ def handle_binary_image_input(path_or_array):
         img = img.astype(np.bool)
     return img
 
-def remove_ticks(ax):
+def plot_image_collection(images, titles, cmap='gray', *subplots_args, **subplots_kwargs):
+    fig, axes = plt.subplots(*subplots_args, **subplots_kwargs)
+    for img, title, ax in zip(images, titles, axes.ravel()):
+        plot_image(img, title, ax, cmap)
+    fig.tight_layout()
+    return fig
+
+def plot_image(img, title, ax, cmap='gray'):
+    ax.imshow(img, cmap=cmap)
+    ax.set_title(title)
     ax.tick_params(
         axis        = 'both',
         which       = 'both',

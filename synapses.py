@@ -90,41 +90,9 @@ def count(neurite_marker,
             combined = utils.grayscale_to_rgb(utils.rescale_0_255(neurites_raw))
             combined[np.where(primary)] = np.array([255, 0, 0])
 
-            # fig = plt.figure()
-            # ax1 = fig.add_subplot(2,4,1)
-            # ax1.imshow(neurites_raw, cmap='gray')
-            # ax1.set_title('neurites')
-
-            # ax2 = fig.add_subplot(2,4,2)
-            # ax2.imshow(neurite_mask, cmap='gray')
-            # ax2.set_title('neurite mask')
-
-            # ax3 = fig.add_subplot(2,4,5)
-            # ax3.imshow(primary_raw, cmap='gray')
-            # ax3.set_title('primary synaptic marker')
-
-            # ax4 = fig.add_subplot(2,4,6)
-            # ax4.imshow(primary, cmap='gray')
-            # ax4.set_title('isolated synapses')
-
-            # ax5 = fig.add_subplot(1,2,2)
-            # ax5.imshow(combined, cmap='gray')
-            # ax5.set_title('neurites & isolated synapses')
-
-            # for ax in [ax1, ax2, ax3, ax4, ax5]:
-            #     ax.set_xticklabels([])
-            #     ax.set_yticklabels([])
-            # fig.tight_layout()
-
-            fig, (ax1, ax2) = plt.subplots(1,2)
-            ax1.imshow(primary_raw, cmap='gray')
-            ax1.set_title('primary synaptic marker')
-            ax2.imshow(combined)
-            ax2.set_title('neurites & isolated synapses')
-            for ax in [ax1, ax2]:
-                ax.set_xticklabels([])
-                ax.set_yticklabels([])
-            fig.tight_layout()
+            images = [primary_raw, combined]
+            titles = ['Primary synaptic marker', 'Neurites & isolate synapses']
+            fig = utils.plot_image_collection(images, titles, cmap=None, nrows=1, ncols=2)
 
         if save != None:
             for ii in plt.get_fignums():
@@ -147,51 +115,9 @@ def count(neurite_marker,
             combined[np.where(primary)] = np.array([255, 0, 0])
             combined[np.where(secondary)] = np.array([0, 255, 0])
 
-            # fig = plt.figure()
-            # ax1 = fig.add_subplot(3,4,1)
-            # ax1.imshow(neurites_raw, cmap='gray')
-            # ax1.set_title('neurites')
-
-            # ax2 = fig.add_subplot(3,4,2)
-            # ax2.imshow(neurite_mask, cmap='gray')
-            # ax2.set_title('neurite mask')
-
-            # ax3 = fig.add_subplot(3,4,5)
-            # ax3.imshow(primary_raw, cmap='gray')
-            # ax3.set_title('primary synaptic marker')
-
-            # ax4 = fig.add_subplot(3,4,6)
-            # ax4.imshow(primary, cmap='gray')
-            # ax4.set_title('isolated synapses')
-
-            # ax5 = fig.add_subplot(3,4,9)
-            # ax5.imshow(secondary_raw, cmap='gray')
-            # ax5.set_title('secondary synaptic marker')
-
-            # ax6 = fig.add_subplot(3,4,10)
-            # ax6.imshow(secondary, cmap='gray')
-            # ax6.set_title('isolated synapses')
-
-            # ax7 = fig.add_subplot(1,2,2)
-            # ax7.imshow(combined)
-            # ax7.set_title('neurites & isolated synapses')
-
-            # for ax in [ax1, ax2, ax3, ax4, ax5, ax6, ax7]:
-            #     ax.set_xticklabels([])
-            #     ax.set_yticklabels([])
-            # fig.tight_layout()
-
-            fig, (ax1, ax2) = plt.subplots(1,2)
-            ax1.imshow(primary_raw + secondary_raw, cmap='gray')
-            ax1.set_title('primary & secondary synaptic marker')
-
-            ax2.imshow(combined)
-            ax2.set_title('neurites & isolated synapses')
-
-            for ax in [ax1, ax2]:
-                ax.set_xticklabels([])
-                ax.set_yticklabels([])
-            fig.tight_layout()
+            images = [primary_raw + secondary_raw, combined]
+            titles = ['Primary & secondary synaptic marker', 'Neurites & isolate synapses']
+            fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
 
         if save != None:
             for ii in plt.get_fignums():

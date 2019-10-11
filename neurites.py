@@ -85,21 +85,24 @@ def isolate(neurite_marker, show=True, save=None):
     neurite_mask = cleaning.remove_small_objects(closed, size_threshold=100)
 
     if show:
-        title_to_image = [
-            ('Neurite marker'                 , raw),
-            ('Local histogram equalisation'   , equalised),
-            ('Phase symmetry'                 , phase),
-            ('Morphological cleaning'         , clean),
-            ('Hough line transform'           , connected),
-            ('Reconstruction and thresholded' , neurite_mask),
+        titles = [
+            'Neurite marker'                 ,
+            'Local histogram equalisation'   ,
+            'Phase symmetry'                 ,
+            'Morphological cleaning'         ,
+            'Hough line transform'           ,
+            'Reconstruction and thresholded' ,
         ]
 
-        fig, axes = plt.subplots(2, 3)
-        for (title, img), ax in zip(title_to_image, axes.ravel()):
-            ax.imshow(img, cmap='gray', interpolation='nearest')
-            ax.set_title(title)
-            utils.remove_ticks(ax)
-        fig.tight_layout()
+        images = [raw,
+                  equalised,
+                  phase,
+                  clean,
+                  connected,
+                  neurite_mask,
+        ]
+
+        fig = utils.plot_image_collection(images, titles, nrows=2, ncols=3)
 
         if save != None:
             fig.savefig(save + '{}.pdf'.format(1), dpi=300)
@@ -142,13 +145,8 @@ def _reconstruct(neurites, skeleton, show=False):
 
     if show:
         images = [neurites, skeleton, reconstructed, combined]
-
-        fig, axes = plt.subplots(2,2)
-        for img, ax in zip(images, axes.ravel()):
-            ax.imshow(img, cmap='gray')
-            utils.remove_ticks(ax)
-
-        fig.tight_layout()
+        titles = ['Neurite mask', 'Medial axis', 'Reconstructed', 'Combined']
+        fig = utils.plot_image_collection(images, titles, nrows=2, ncols=2)
 
     return utils.rescale_0_255(combined)
 
@@ -178,20 +176,10 @@ def get_length(neurite_mask, show=False, save=None):
     neurite_length = neurite_skeleton.sum()
 
     if show:
-        fig, (ax1, ax2) = plt.subplots(1,2)
+        images = [neurite_mask, neurite_skeleton]
+        titles = ['Neurite mask', 'Medial axis']
+        fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
         fig.suptitle('Neurite length', fontsize='large')
-
-        ax1.imshow(neurite_mask, cmap='gray')
-        ax1.set_title('binary mask')
-
-        ax2.imshow(neurite_skeleton, cmap='gray')
-        ax2.set_title('medial axis')
-
-        for ax in [ax1, ax2]:
-            ax.set_xticklabels([])
-            ax.set_yticklabels([])
-        fig.tight_layout()
-
         if save != None:
             fig.savefig(save + '{}.pdf'.format(2), dpi=300)
 
