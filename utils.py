@@ -63,7 +63,7 @@ def plot_image_collection(images, titles, cmap='gray', *subplots_args, **subplot
 
 def plot_image(img, title, ax, cmap='gray'):
     ax.imshow(img, cmap=cmap)
-    ax.set_title(title)
+    ax.set_title(title, fontsize='small')
     ax.tick_params(
         axis        = 'both',
         which       = 'both',
