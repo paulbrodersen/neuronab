@@ -84,14 +84,18 @@ def isolate(neurite_marker, show=True, save=None):
     # remove isolated blobs
     neurite_mask = cleaning.remove_small_objects(closed, size_threshold=100)
 
-        images = [raw, equalised, phase, clean, connected, neurite_mask]
-        titles = ['Neurite marker', 'Local histogram equalisation', 'Phase symmetry',
-                  'Morphological cleaning', 'Hough line transform', 'Reconstruction and thresholded']
-
-        fig, axes = plt.subplots(2,3,sharex=True,sharey=True)
-        # fig.suptitle('Neurite isolation', fontsize=TITLE_FONT_SIZE)
-        for img, ax, title in zip(images, axes.ravel(), titles):
     if show:
+        title_to_image = [
+            ('Neurite marker'                 , raw),
+            ('Local histogram equalisation'   , equalised),
+            ('Phase symmetry'                 , phase),
+            ('Morphological cleaning'         , clean),
+            ('Hough line transform'           , connected),
+            ('Reconstruction and thresholded' , neurite_mask),
+        ]
+
+        fig, axes = plt.subplots(2, 3)
+        for (title, img), ax in zip(title_to_image, axes.ravel()):
             ax.imshow(img, cmap='gray', interpolation='nearest')
             ax.set_title(title)
             utils.remove_ticks(ax)
@@ -137,12 +141,11 @@ def _reconstruct(neurites, skeleton, show=False):
     combined = reconstructed + holes
 
     if show:
+        images = [neurites, skeleton, reconstructed, combined]
+
         fig, axes = plt.subplots(2,2)
-        axes = axes.ravel()
-        axes[0].imshow(neurites, cmap='gray')
-        axes[1].imshow(skeleton, cmap='gray')
-        axes[2].imshow(reconstructed, cmap='gray')
-        axes[3].imshow(combined, cmap='gray')
+        for img, ax in zip(images, axes.ravel()):
+            ax.imshow(img, cmap='gray')
             utils.remove_ticks(ax)
 
         fig.tight_layout()
