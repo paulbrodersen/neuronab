@@ -179,7 +179,7 @@ def count(neurite_marker,
                             min_synapse_brightness, show)
         secondary_count = _count_objects(secondary)
 
-        dual_labelled = _is_dual_labelled(primary, secondary, show=False)
+        dual_labelled = np.logical_and(primary, secondary)
         dual_labelled_count = _count_objects(dual_labelled)
 
         if show:
@@ -203,22 +203,3 @@ def _count_objects(binary_mask):
     label_objects, nb_labels = scipy.ndimage.label(binary_mask)
     count = label_objects.max()
     return count
-
-
-def _is_dual_labelled(primary, secondary, show):
-    dual_labelled = np.logical_and(primary, secondary)
-
-    if show:
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-        ax1.imshow(primary, cmap='gray')
-        ax1.set_title('primary marker')
-        ax2.imshow(secondary, cmap='gray')
-        ax2.set_title('secondary marker')
-        ax3.imshow(dual_labelled, cmap='gray')
-        ax3.set_title('dual labelled')
-        for ax in [ax1, ax2, ax3]:
-            ax.set_xticklabels([])
-            ax.set_yticklabels([])
-        fig.tight_layout()
-
-    return dual_labelled
