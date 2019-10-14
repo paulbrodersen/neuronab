@@ -74,3 +74,8 @@ def plot_image(img, title, ax, cmap='gray'):
         labelbottom = False,
         labelleft   = False,
     )
+
+def count_objects(binary_mask):
+    label_objects, nb_labels = scipy.ndimage.label(binary_mask)
+    count = label_objects.max()
+    return count

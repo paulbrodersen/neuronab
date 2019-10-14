@@ -76,124 +76,17 @@ def get_mask(synaptic_marker,
     return synapse_mask
 
 
-def get_count(neurite_marker,
-              primary_synaptic_marker,
-              secondary_synaptic_marker=None,
-              min_synapse_size=16,
-              max_synapse_size=144,
-              min_synapse_brightness=97.5,
-              show=False,
-              save=None):
+def get_count(synapse_mask):
+    """Count the number of putative synapses in the synapse mask.
 
-    """
     Arguments:
     ----------
-        neurite_marker: string or numpy.uint8 array
-            path to grayscale image of neurite marker OR
-            corresponding numpy array with values in the range (0-255)
-
-        primary_synaptic_marker: string or numpy.uint8 array
-            path to grayscale image of synaptic marker OR
-            corresponding numpy array with values in the range (0-255)
-
-        secondary_synaptic_marker: string or numpy.uint8 array (optional, default None)
-            path to grayscale image of a secondary synaptic marker OR
-            corresponding numpy array with values in the range (0-255)
-
-        min_synapse_size: int
-            minimum acceptable synapse sizes in pixels
-
-        max_synapse_size: int
-            maximum acceptable synapse sizes in pixels
-
-        min_synapse_brightness: float in the range 0.-100., (default 97.5)
-            image intensity threshold in percent above which objects
-            in synaptic marker images are labelled as putative synapses
-
-        show: bool (default False)
-            if True, plots intermediate steps of image analysis
-
-        save: str (default None)
-    `      if not None (and show is True), figures will be saved under save+<integer>.pdf
+        synapse_mask: numpy.bool array
+            binary image indicating the presence of a synapse
 
     Returns:
     --------
-        neurite_length: int
-            total length of neurites in pixels
-
-        primary_synaptic_marker_count: int
-            number of synapses detected in image of primary synaptic marker
-
-        secondary_synaptic_marker_count: int
-            number of synapses detected in image of secondary synaptic marker;
-            only returned if secondary_synaptic_marker is not None;
-
-        dual_labelled: int
-            number of synapses detected in images of both synaptic markers;
-            only returned if secondary_synaptic_marker is not None;
-
+        synapse_count : int
+            number synapses
     """
-
-    # manage input
-    neurites_raw = utils.handle_grayscale_image_input(neurite_marker)
-    primary_raw = utils.handle_grayscale_image_input(primary_synaptic_marker)
-
-    if secondary_synaptic_marker != None:
-        secondary_raw = utils.handle_grayscale_image_input(secondary_synaptic_marker)
-
-    # isolate neurites and determine neurite length
-    neurite_mask = neurites.get_mask(neurites_raw, show)
-    neurite_length = neurites.get_length(neurite_mask, show)
-
-    # find synapse candidates and count
-    primary = get_mask(primary_raw, neurite_mask,
-                      min_synapse_size, max_synapse_size, min_synapse_brightness, show)
-    primary_count = _count_objects(primary)
-
-    if secondary_synaptic_marker is None:
-
-        if show:
-            combined = utils.grayscale_to_rgb(utils.rescale_0_255(neurites_raw))
-            combined[np.where(primary)] = np.array([255, 0, 0])
-
-            images = [primary_raw, combined]
-            titles = ['Primary synaptic marker', 'Neurites & isolate synapses']
-            fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
-
-        if save != None:
-            for ii in plt.get_fignums():
-                plt.figure(ii)
-                plt.savefig(save + '{}.pdf'.format(ii), dpi=300)
-
-        return neurite_length, primary_count
-
-    else:
-        secondary = get_mask(secondary_raw, neurite_mask,
-                            min_synapse_size, max_synapse_size,
-                            min_synapse_brightness, show)
-        secondary_count = _count_objects(secondary)
-
-        dual_labelled = np.logical_and(primary, secondary)
-        dual_labelled_count = _count_objects(dual_labelled)
-
-        if show:
-            combined = utils.grayscale_to_rgb(utils.rescale_0_255(neurites_raw))
-            combined[np.where(primary)] = np.array([255, 0, 0])
-            combined[np.where(secondary)] = np.array([0, 255, 0])
-
-            images = [primary_raw + secondary_raw, combined]
-            titles = ['Primary & secondary synaptic marker', 'Neurites & isolated synapses']
-            fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
-
-        if save != None:
-            for ii in plt.get_fignums():
-                plt.figure(ii)
-                plt.savefig(save + '{}.pdf'.format(ii), dpi=300)
-
-        return neurite_length, primary_count, secondary_count, dual_labelled_count
-
-
-def _count_objects(binary_mask):
-    label_objects, nb_labels = scipy.ndimage.label(binary_mask)
-    count = label_objects.max()
-    return count
+    return utils.count_objects(synapse_mask)
