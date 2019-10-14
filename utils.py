@@ -55,7 +55,7 @@ def handle_binary_image_input(path_or_array):
     return img
 
 def plot_image_collection(images, titles, cmap='gray', *subplots_args, **subplots_kwargs):
-    fig, axes = plt.subplots(*subplots_args, **subplots_kwargs)
+    fig, axes = plt.subplots(sharex=True, sharey=True, *subplots_args, **subplots_kwargs)
     for img, title, ax in zip(images, titles, axes.ravel()):
         plot_image(img, title, ax, cmap)
     fig.tight_layout()
@@ -64,6 +64,7 @@ def plot_image_collection(images, titles, cmap='gray', *subplots_args, **subplot
 def plot_image(img, title, ax, cmap='gray'):
     ax.imshow(img, cmap=cmap)
     ax.set_title(title, fontsize='small')
+    ax.set_adjustable('box')
     ax.tick_params(
         axis        = 'both',
         which       = 'both',
