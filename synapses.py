@@ -11,14 +11,24 @@ import utils
 import neurites
 
 
-def get_mask(synaptic_marker,
-             neurite_mask,
+def get_mask(synaptic_marker, neurite_mask,
              min_synapse_size=16,
              max_synapse_size=144,
              min_synapse_brightness=97.5,
              show=False):
 
-    """
+    """Given a grayscale image of a synaptic stain, and a boolean mask for
+    neurites, determine the pixels corresponding to synapses in the following steps:
+
+    1) Only bright pixels can contain a synapse. Hence threshold the
+    synaptic stain based on brightness.
+
+    2) Synapses have a certain size. Hence remove objects that are
+    either too small or too large.
+
+    3) Synapses are on neurites. Hence remove all synapse candidates
+    that are not on -- or the immediate vicinity of -- a neurite.
+
     Arguments:
     ----------
         synaptic_marker: string or numpy.uint8 array
