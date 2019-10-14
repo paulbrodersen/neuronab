@@ -11,12 +11,12 @@ import utils
 import neurites
 
 
-def isolate(synaptic_marker,
-            neurite_mask,
-            min_synapse_size=16,
-            max_synapse_size=144,
-            min_synapse_brightness=97.5,
-            show=False):
+def get_mask(synaptic_marker,
+             neurite_mask,
+             min_synapse_size=16,
+             max_synapse_size=144,
+             min_synapse_brightness=97.5,
+             show=False):
 
     """
     Arguments:
@@ -142,11 +142,11 @@ def count(neurite_marker,
         secondary_raw = utils.handle_grayscale_image_input(secondary_synaptic_marker)
 
     # isolate neurites and determine neurite length
-    neurite_mask = neurites.isolate(neurites_raw, show)
+    neurite_mask = neurites.get_mask(neurites_raw, show)
     neurite_length = neurites.get_length(neurite_mask, show)
 
     # find synapse candidates and count
-    primary = isolate(primary_raw, neurite_mask,
+    primary = get_mask(primary_raw, neurite_mask,
                       min_synapse_size, max_synapse_size, min_synapse_brightness, show)
     primary_count = _count_objects(primary)
 
@@ -168,7 +168,7 @@ def count(neurite_marker,
         return neurite_length, primary_count
 
     else:
-        secondary = isolate(secondary_raw, neurite_mask,
+        secondary = get_mask(secondary_raw, neurite_mask,
                             min_synapse_size, max_synapse_size,
                             min_synapse_brightness, show)
         secondary_count = _count_objects(secondary)
@@ -182,7 +182,7 @@ def count(neurite_marker,
             combined[np.where(secondary)] = np.array([0, 255, 0])
 
             images = [primary_raw + secondary_raw, combined]
-            titles = ['Primary & secondary synaptic marker', 'Neurites & isolate synapses']
+            titles = ['Primary & secondary synaptic marker', 'Neurites & isolated synapses']
             fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
 
         if save != None:

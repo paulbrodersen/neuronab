@@ -62,7 +62,7 @@ def isolate_neurites(spreadsheet_path):
     """
     spreadsheet_io.apply_and_append(
         spreadsheet_path,
-        func=neurites.isolate,
+        func=neurites.get_mask,
         arguments=['neurite_marker',
                    'show',
                    'save'],

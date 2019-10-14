@@ -13,7 +13,7 @@ import phasepack.phasepack as pp
 import cleaning
 import utils
 
-def isolate(neurite_marker, show=True, save=None):
+def get_mask(neurite_marker, show=True, save=None):
     """
     Arguments:
     ----------
