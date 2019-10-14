@@ -13,8 +13,23 @@ import phasepack.phasepack as pp
 import cleaning
 import utils
 
+
 def get_mask(neurite_marker, show=True, save=None):
-    """
+    """Given a neurite stain image, returm a boolean mask that evaluates
+    to true where there is a neurite. We carry out the following steps:
+
+    1) Apply rank equalisation to obtain an evenly illuminated image.
+
+    2) Use phase symmetry to isolate symmetrical objects in the
+    image. As neurites are roughly tubular, they are symmetric around
+    their medial axis and thus have a high phase symmetry.
+
+    3) Use morphological cleaning to remove noise.
+
+    4) As the neurites will not be symmetric in all locations, there
+    are gaps , in particular at branch points. We use hough line
+    transforms to connect broken segments if they are not too far apart.
+
     Arguments:
     ----------
         neurite_marker: string or numpy.uint8 array
