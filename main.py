@@ -51,7 +51,7 @@ def count_synapses(spreadsheet_path):
     return
 
 def test_count_synapses(spreadsheet_path=test_spreadsheet_path):
-    if spreadsheet_path == None:
+    if spreadsheet_path is None:
         spreadsheet_path = prompt_for_existing_path("Please provide the full path to the spreadsheet: \n")
     return count_synapses(spreadsheet_path)
 
@@ -71,6 +71,6 @@ def isolate_neurites(spreadsheet_path):
     return
 
 def test_isolate_neurites(spreadsheet_path=test_spreadsheet_path):
-    if spreadsheet_path == None:
+    if spreadsheet_path is None:
         spreadsheet_path = prompt_for_existing_path("Please provide the full path to the spreadsheet: \n")
     return isolate_neurites(spreadsheet_path)
