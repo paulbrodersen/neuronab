@@ -76,14 +76,14 @@ def get_mask(synaptic_marker,
     return synapse_mask
 
 
-def count(neurite_marker,
-          primary_synaptic_marker,
-          secondary_synaptic_marker=None,
-          min_synapse_size=16,
-          max_synapse_size=144,
-          min_synapse_brightness=97.5,
-          show=False,
-          save=None):
+def get_count(neurite_marker,
+              primary_synaptic_marker,
+              secondary_synaptic_marker=None,
+              min_synapse_size=16,
+              max_synapse_size=144,
+              min_synapse_brightness=97.5,
+              show=False,
+              save=None):
 
     """
     Arguments:

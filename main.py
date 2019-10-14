@@ -34,7 +34,7 @@ def count_synapses(spreadsheet_path):
     """
     spreadsheet_io.apply_and_append(
         spreadsheet_path,
-        func=synapses.count,
+        func=synapses.get_count,
         arguments=['neurite_marker',
                    'primary_synaptic_marker',
                    'secondary_synaptic_marker',
