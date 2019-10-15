@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 import skimage.morphology
 
 from skimage import draw
 from skimage.filters import rank
 from skimage.transform import probabilistic_hough_line
 
-import phasepack.phasepack as pp
-import cleaning
-import utils
+import phasepack.phasepack as phasepack
+import neuronab.cleaning as cleaning
+import neuronab.utils as utils
 
 
 def get_mask(neurite_marker, show=True, save=None):
@@ -55,15 +53,15 @@ def get_mask(neurite_marker, show=True, save=None):
     equalised = rank.equalize(raw, selem=selem)
 
     # determine local phase-symmetry -> maxima correspond to neurite
-    phase = pp.phasesym(equalised,
-                        nscale        = 5,
-                        norient       = 3,
-                        minWaveLength = 1.,
-                        mult          = 3.,
-                        sigmaOnf      = 0.55,
-                        k             = 1.,
-                        polarity      = 1,
-                        noiseMethod   = -1)[0]
+    phase = phasepack.phasesym(equalised,
+                               nscale        = 5,
+                               norient       = 3,
+                               minWaveLength = 1.,
+                               mult          = 3.,
+                               sigmaOnf      = 0.55,
+                               k             = 1.,
+                               polarity      = 1,
+                               noiseMethod   = -1)[0]
     phase = utils.rescale_0_255(phase)
 
     # Morphological cleaning using 1-connectivity:

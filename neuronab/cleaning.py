@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 import numpy as np
 import scipy.ndimage
 import skimage.morphology as sm
 
-from utils import rescale_0_255, imcomplement
+from neuronab.utils import rescale_0_255, imcomplement
 
 def remove_small_objects(binary_img, size_threshold=100):
     label_objects, nb_labels = scipy.ndimage.label(binary_img)

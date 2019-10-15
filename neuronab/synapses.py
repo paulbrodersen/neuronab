@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import scipy.ndimage
 import skimage.morphology
 
-import cleaning
-import utils
-import neurites
+import neuronab.cleaning
+import neuronab.utils
+import neuronab.neurites
 
 
 def get_mask(synaptic_marker, neurite_mask,
