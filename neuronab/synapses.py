@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 
 import numpy as np
-import matplotlib.pyplot as plt
 
-import scipy.ndimage
-import skimage.morphology
+from skimage.morphology import (
+    binary_dilation,
+    disk,
+)
 
-import neuronab.cleaning
-import neuronab.utils
-import neuronab.neurites
+from neuronab import (
+    cleaning,
+    utils,
+    neurites,
+)
 
 
 def get_mask(synaptic_marker, neurite_mask,
@@ -72,8 +75,8 @@ def get_mask(synaptic_marker, neurite_mask,
 
     # restrict synapse candidates to puncta within or juxtaposed to the neurite mask;
     # dilate mask to catch synapses that are next to the neurite but not directly on it
-    dilated = skimage.morphology.binary_dilation(neurite_mask, skimage.morphology.disk(2))
-    synapse_mask = np.logical_and(cleaned, dilated)
+    neurite_mask = binary_dilation(neurite_mask, disk(2))
+    synapse_mask = np.logical_and(cleaned, neurite_mask)
 
     if show:
         cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
