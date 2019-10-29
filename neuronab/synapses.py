@@ -79,12 +79,9 @@ def get_mask(synaptic_marker, neurite_mask,
     synapse_mask = np.logical_and(cleaned, neurite_mask)
 
     if show:
-        cleaned = utils.rescale_0_255(cleaned) + 50 * neurite_mask
-
-        images = [synapses_raw, thresholded, cleaned, synapse_mask]
+        images = [synapses_raw, thresholded, cleaned+0.3*thresholded, synapse_mask+0.3*neurite_mask]
         titles = ['Synaptic marker', 'Thresholded', 'Within size range', 'Within neurite mask']
         fig = utils.plot_image_collection(images, titles, nrows=2, ncols=2)
-        fig.subplots_adjust(top=0.85)
 
     return synapse_mask
 
