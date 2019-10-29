@@ -25,29 +25,31 @@ def get_mask(neurite_marker,
 
     Arguments:
     ----------
-        neurite_marker: string or numpy.uint8 array
-            path to image of neurite marker OR
-            corresponding grayscale image with intensities in the range (0-255)
+    neurite_marker: string or numpy.uint8 array
+        path to image of neurite marker OR
+        corresponding grayscale image with intensities in the range (0-255)
 
-        sigmas: iterable of floats (default range(1,5))
-            Meijering filter scales.
+    sigmas: iterable of floats (default range(1,5))
+        Meijering filter scales.
 
-        intensity_threshold: float (default 75.)
-            Intensity threshold in percent.
-            Applied after the Meijering filter to obtain a mask from the grayscale
-            image.
+    intensity_threshold: float (default 75.)
+        Intensity threshold in percent.
+        Applied after the Meijering filter to obtain a mask from the grayscale
+        image.
 
-        size_threshold: int (default 1000)
-            Object size threshold in pixels.
-            Smaller objects are removed from the mask.
+    size_threshold: int (default 1000)
+        Object size threshold in pixels.
+        Smaller objects are removed from the mask.
 
-        show: bool (default True)
-            if True, plots intermediate steps of image analysis
+    show: bool (default True)
+        if True, plots intermediate steps of image analysis
 
     Returns:
     --------
-        neurite_mask: numpy.bool array
-            binary image indicating the presence of neurites
+    neurite_mask: ndarray
+        Grayscale image indicating the presence of neurites.
+        Pixel intensity scales approximately with the certainty that the pixel
+        is part of a neurites.
 
     References:
     -----------
