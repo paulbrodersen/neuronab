@@ -12,8 +12,8 @@ import neuronab.neurites
 
 
 def get_mask(synaptic_marker, neurite_mask,
-             min_synapse_size=16,
-             max_synapse_size=144,
+             min_synapse_size=25,
+             max_synapse_size=400,
              min_synapse_brightness=97.5,
              show=False):
 
@@ -39,10 +39,10 @@ def get_mask(synaptic_marker, neurite_mask,
             path to binary image indicating the presence of neurites, OR
             corresponding boolean numpy.ndarray
 
-        min_synapse_size: int
+        min_synapse_size: int (default 25)
             minimum acceptable synapse sizes in pixels
 
-        max_synapse_size: int
+        max_synapse_size: int (default 400)
             maximum acceptable synapse sizes in pixels
 
         min_synapse_brightness: float in the range 0.-100., (default 95.)
