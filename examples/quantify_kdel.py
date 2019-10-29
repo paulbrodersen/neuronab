@@ -27,19 +27,21 @@ if __name__ == '__main__':
     kdel = utils.handle_grayscale_image_input(kdel_path)
     pv   = utils.handle_grayscale_image_input(pv_path)
 
-    neun_mask = somata.get_mask(neun, intensity_threshold=50, show=True) > 0
-    counts, blobs = somata.get_count(neun_path, neun_mask, threshold=0.05, show=True)
+    neun_mask = somata.get_mask(neun, intensity_threshold=50, show=True)
+    # counts = somata.get_count(neun_mask, neun_path, threshold=0.05, show=True)
+    counts = somata.get_count(neun_mask, threshold=0.05, show=True)
     print(f'Number of NeuN positive cells: {counts}')
 
-    images = [kdel, neun, neun_mask, kdel * neun_mask]
+    images = [kdel, neun, neun_mask, kdel * (neun_mask > 0)]
     titles = ['KDEL', 'NeuN', 'Soma mask', 'Masked KDEL']
     utils.plot_image_collection(images, titles, nrows=2, ncols=2)
 
-    pv_mask = somata.get_mask(pv, intensity_threshold=95, show=True) > 0
-    counts, blobs = somata.get_count(pv_path, pv_mask, threshold=0.1, show=True)
+    pv_mask = somata.get_mask(pv, intensity_threshold=95, show=True)
+    # counts = somata.get_count(pv_mask, pv, threshold=0.1, show=True)
+    counts = somata.get_count(pv_mask, threshold=0.1, show=True)
     print(f'Number of PV positive cells: {counts}')
 
-    images = [kdel, pv, pv_mask, kdel * pv_mask]
+    images = [kdel, pv, pv_mask, kdel * (pv_mask > 0)]
     titles = ['KDEL', 'PV', 'Soma mask', 'Masked KDEL']
     utils.plot_image_collection(images, titles, nrows=2, ncols=2)
 

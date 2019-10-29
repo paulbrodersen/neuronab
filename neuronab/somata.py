@@ -90,15 +90,60 @@ def get_mask(soma_marker, intensity_threshold=50., size_threshold=50, show=True)
     return clean
 
 
-def get_count(soma_marker, soma_mask=None, threshold=0.1, show=True):
+def get_count(soma_mask, soma_marker=None, threshold=0.1, return_soma_parameters=False, show=True, *args, **kwargs):
+    """
+    Count the number of somata.
+    1) Estimate the lower and upper bound on soma size based on the separable
+       objects in the soma mask.
+    2) Detect blobs of the right sizes in the image.
+
+    Arguments:
+    ----------
+    soma_mask: ndarray
+        Grayscale image indicating the presence of somata.
+        Pixel intensity scales approximately with the certainty that the pixel
+        is part of a soma.
+
+    soma_marker : ndarray or None (default None)
+        Fluorescence image used to create the mask.
+        If given, this image is used to find the soma rather than the soma mask.
+        This is a more sensitive approach that will pick up fainter and/or less
+        circular soma.
+
+    threshold : float, optional (default 0.1).
+        The absolute lower bound for scale space maxima. Local maxima smaller
+        than the threshold are ignored. Reduce this to detect blobs with less
+        relative intensity w.r.t. the background.
+
+    return_soma_parameters : bool
+        If true, also return the parameters of the detected somata
+
+    show: bool
+        Plotting flag.
+
+    Returns:
+    --------
+    count : int
+        Number of soma in the image.
+
+    soma_parameters: (n, 3) ndarray
+        List of (x, y, radius) tuples indicating soma position and radius.
+
+    """
     # estimate bounds on soma area in pixels
-    if soma_mask is None:
-        soma_mask = get_mask(soma_marker, show=show) > 0
-    mode, (lower, upper) = _get_soma_size(soma_mask, show=show)
+    mode, (lower, upper) = _get_soma_size(soma_mask > 0, show=show)
 
     # fit blobs; constrain fit using bounds on soma size
-    blobs = _detect_blobs(soma_marker, lower, upper, threshold, show=show)
-    return len(blobs), blobs
+    if soma_marker is None:
+        blobs = _detect_blobs(soma_mask, lower, upper, threshold, show=show)
+    else:
+        soma_marker = utils.handle_grayscale_image_input(soma_marker)
+        blobs = _detect_blobs(soma_marker, lower, upper, show=show, *args, **kwargs)
+
+    if return_soma_parameters:
+        return len(blobs), blobs
+    else:
+        return len(blobs)
 
 
 def _get_soma_size(soma_mask, show=True):
