@@ -1,39 +1,45 @@
 #!/usr/bin/env python
 
 import numpy as np
-import skimage.morphology
 
-from skimage import draw
-from skimage.filters import rank
-from skimage.transform import probabilistic_hough_line
+from skimage.morphology import disk, medial_axis
+from skimage.filters import rank, meijering
+from skimage.measure import label
+from skimage.color import label2rgb
 
-import phasepack.phasepack as phasepack
-import neuronab.cleaning as cleaning
-import neuronab.utils as utils
+from neuronab import utils
 
 
 def get_mask(neurite_marker,
+             sigmas=range(1, 5),
+             intensity_threshold=75.,
+             size_threshold=1000,
              show=True):
     """Given a neurite stain image, returm a boolean mask that evaluates
     to true where there is a neurite. We carry out the following steps:
 
     1) Apply rank equalisation to obtain an evenly illuminated image.
-
-    2) Use phase symmetry to isolate symmetrical objects in the
-    image. As neurites are roughly tubular, they are symmetric around
-    their medial axis and thus have a high phase symmetry.
-
-    3) Use morphological cleaning to remove noise.
-
-    4) As the neurites will not be symmetric in all locations, there
-    are gaps , in particular at branch points. We use hough line
-    transforms to connect broken segments if they are not too far apart.
+    2) Apply the filter by Meijering et al. to isolate tubular structures.
+    3) Obtain a mask by applying an intensity threshold.
+    4) Remove small objects to clean up the mask.
 
     Arguments:
     ----------
         neurite_marker: string or numpy.uint8 array
             path to image of neurite marker OR
             corresponding grayscale image with intensities in the range (0-255)
+
+        sigmas: iterable of floats (default range(1,5))
+            Meijering filter scales.
+
+        intensity_threshold: float (default 75.)
+            Intensity threshold in percent.
+            Applied after the Meijering filter to obtain a mask from the grayscale
+            image.
+
+        size_threshold: int (default 1000)
+            Object size threshold in pixels.
+            Smaller objects are removed from the mask.
 
         show: bool (default True)
             if True, plots intermediate steps of image analysis
@@ -43,123 +49,80 @@ def get_mask(neurite_marker,
         neurite_mask: numpy.bool array
             binary image indicating the presence of neurites
 
+    References:
+    -----------
+    Meijering, E., Jacob, M., Sarria, J. C., Steiner, P., Hirling, H.,
+    Unser, M. (2004). Design and validation of a tool for neurite
+    tracing and analysis in fluorescence microscopy images. Cytometry
+    Part A, 58(2), 167-176. DOI:10.1002/cyto.a.20022
+
     """
     # handle input
     raw = utils.handle_grayscale_image_input(neurite_marker)
 
-    selem = skimage.morphology.disk(50)
-    equalised = rank.equalize(raw, selem=selem)
+    # equalise
+    equalised = rank.equalize(raw, selem=disk(50))
 
-    # determine local phase-symmetry -> maxima correspond to neurite
-    phase = phasepack.phasesym(equalised,
-                               nscale        = 5,
-                               norient       = 3,
-                               minWaveLength = 1.,
-                               mult          = 3.,
-                               sigmaOnf      = 0.55,
-                               k             = 1.,
-                               polarity      = 1,
-                               noiseMethod   = -1)[0]
-    phase = utils.rescale_0_255(phase)
+    # apply meijering filter
+    filtered = _apply_meijering_filter(equalised, sigmas)
 
-    # Morphological cleaning using 1-connectivity:
-    # clean with a vertical/horizontal and diagonal cross individually,
-    # and then combine the results.
-    # This leverages the elongated nature of the neurites.
-    # Use the combination of both crosses (i.e. a square) yields inferior results.
-    selem = np.array([[1, 0, 1], [0, 1, 0], [1, 0, 1]])
-    clean_1 = cleaning.morphological_cleaning(phase, selem)
-    selem = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
-    clean_2 = cleaning.morphological_cleaning(phase, selem)
-    clean = clean_1 + clean_2
+    # threshold
+    thresholded = filtered > np.percentile(filtered, intensity_threshold)
 
-    # get neurite skeleton
-    skeleton = _skeletonize(clean)
-
-    # connect isolated pieces by finding straight lines through them
-    connected = _connect_broken_lines(skeleton, threshold=1, line_length=50, line_gap=25)
-
-    # using skeleton as a seed, reconstruct the cleaned phase image
-    reconstructed = _reconstruct(clean, connected)
-
-    # threshold to binary mask
-    binary = reconstructed > 0
-
-    # close elements
-    disk = skimage.morphology.disk(3)
-    closed = skimage.morphology.closing(binary, disk)
-
-    # remove isolated blobs
-    neurite_mask = cleaning.remove_small_objects(closed, size_threshold=100)
+    # remove small objects in the image
+    clean = _remove_small_objects(thresholded, size_threshold)
 
     if show:
+        combined = raw.astype(np.float)
+        combined[clean] *= 1.15
+
         titles = [
-            'Neurite marker'                 ,
-            'Local histogram equalisation'   ,
-            'Phase symmetry'                 ,
-            'Morphological cleaning'         ,
-            'Hough line transform'           ,
-            'Reconstruction and thresholded' ,
+            'Neurite marker'               ,
+            'Local histogram equalisation' ,
+            'Meijering ridge filter'       ,
+            'Thresholded'                  ,
+            'Removed small objects'        ,
+            'Combined'                     ,
         ]
 
-        images = [raw,
-                  equalised,
-                  phase,
-                  clean,
-                  connected,
-                  neurite_mask,
+        images = [raw         ,
+                  equalised   ,
+                  filtered    ,
+                  thresholded ,
+                  clean       ,
+                  combined    ,
         ]
 
-        fig = utils.plot_image_collection(images, titles, nrows=2, ncols=3)
+        fig1 = utils.plot_image_collection(images, titles, nrows=2, ncols=3)
+        fig2 = utils.plot_image_mask_comparison(raw, clean)
 
-        if save != None:
-            fig.savefig(save + '{}.pdf'.format(1), dpi=300)
-
-    return neurite_mask
+    return clean
 
 
-def _skeletonize(binary_image):
-    return skimage.morphology.medial_axis(binary_image)
+def _apply_meijering_filter(image, sigmas):
+    smoothed = rank.mean_percentile(iamage, disk(5), p0=0.25, p1=0.75)
+    filtered = meijering(smoothed, sigmas=sigmas, black_ridges=False)
+
+    # Meijering filter always evaluates to high values at the image frame;
+    # we hence set the filtered image to zero at those locations
+    frame = np.ones_like(filtered, dtype=np.bool)
+    d = 2 * np.max(sigmas) + 1
+    frame[d:-d, d:-d] = False
+    filtered[frame] = np.min(filtered)
+
+    return filtered
 
 
-def _connect_broken_lines(broken, threshold=1, line_length=30, line_gap=20):
-    lines = probabilistic_hough_line(broken,
-                                     threshold,
-                                     line_length,
-                                     line_gap)
-    connected = np.zeros_like(broken, dtype=np.uint8)
-    for line in lines:
-        p0, p1 = line
-        rr, cc = draw.line(p0[1], p0[0], p1[1], p1[0])
-        connected[rr, cc] += 1
-
-    return connected
+def _remove_small_objects(binary_mask, size_threshold):
+    label_image = label(binary_mask)
+    object_sizes = np.bincount(label_image.ravel())
+    labels2keep, = np.where(object_sizes > size_threshold)
+    labels2keep = labels2keep[1:] # remove the first label, which corresponds to the background
+    clean = np.in1d(label_image.ravel(), labels2keep).reshape(label_image.shape)
+    return clean
 
 
-def _reconstruct(neurites, skeleton, show=False):
-
-    # reconstruct neurites from the skeleton outwards;
-    # seed value for reconstruct cannot exceed the pixel value in the neurite image
-    seed = np.zeros_like(neurites)
-    seed[skeleton > 0] = neurites[skeleton > 0]
-    reconstructed = skimage.morphology.reconstruction(seed, neurites)
-
-    # use skeleton value in regions where the pixel value in the neurite image
-    # is smaller than in the skeleton image;
-    holes = np.zeros_like(neurites)
-    fill_value = np.median(neurites[neurites > 0])
-    holes[skeleton > neurites] = fill_value
-    combined = reconstructed + holes
-
-    if show:
-        images = [neurites, skeleton, reconstructed, combined]
-        titles = ['Neurite mask', 'Medial axis', 'Reconstructed', 'Combined']
-        fig = utils.plot_image_collection(images, titles, nrows=2, ncols=2)
-
-    return utils.rescale_0_255(combined)
-
-
-def get_length(neurite_mask, show=False, save=None):
+def get_length(neurite_mask, show=False):
     """
     Arguments:
     ----------
@@ -177,7 +140,7 @@ def get_length(neurite_mask, show=False, save=None):
     """
 
     neurite_mask = utils.handle_binary_image_input(neurite_mask)
-    neurite_skeleton = _skeletonize(neurite_mask)
+    neurite_skeleton = medial_axis(neurite_mask)
     neurite_length = neurite_skeleton.sum()
 
     if show:
