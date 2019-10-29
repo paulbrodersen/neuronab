@@ -34,31 +34,31 @@ def get_mask(synaptic_marker, neurite_mask,
 
     Arguments:
     ----------
-        synaptic_marker: string or numpy.uint8 array
-            path to grayscale image of synaptic marker, OR
-            corresponding numpy array with values in the range (0-255)
+    synaptic_marker: string or numpy.uint8 array
+        path to grayscale image of synaptic marker, OR
+        corresponding numpy array with values in the range (0-255)
 
-        neurite_mask: string or numpy.bool array
-            path to binary image indicating the presence of neurites, OR
-            corresponding boolean numpy.ndarray
+    neurite_mask: string or numpy.bool array
+        path to binary image indicating the presence of neurites, OR
+        corresponding boolean numpy.ndarray
 
-        min_synapse_size: int (default 25)
-            minimum acceptable synapse sizes in pixels
+    min_synapse_size: int (default 25)
+        minimum acceptable synapse sizes in pixels
 
-        max_synapse_size: int (default 400)
-            maximum acceptable synapse sizes in pixels
+    max_synapse_size: int (default 400)
+        maximum acceptable synapse sizes in pixels
 
-        min_synapse_brightness: float in the range 0.-100., (default 95.)
-            image intensity threshold in percent above which objects
-            in synaptic marker images are labelled as putative synapses
+    min_synapse_brightness: float in the range 0.-100., (default 95.)
+        image intensity threshold in percent above which objects
+        in synaptic marker images are labelled as putative synapses
 
-        show: bool (default True)
-            if True, plots intermediate steps of image analysis
+    show: bool (default True)
+        if True, plots intermediate steps of image analysis
 
     Returns:
     --------
-        synapse_mask: numpy.bool array
-            binary image indicating the presence of a synapse
+    synapse_mask: numpy.bool array
+        binary image indicating the presence of a synapse
 
     """
 
@@ -91,12 +91,12 @@ def get_count(synapse_mask):
 
     Arguments:
     ----------
-        synapse_mask: numpy.bool array
-            binary image indicating the presence of a synapse
+    synapse_mask: numpy.bool array
+        binary image indicating the presence of a synapse
 
     Returns:
     --------
-        synapse_count : int
-            number synapses
+    synapse_count : int
+        number synapses
     """
     return utils.count_objects(synapse_mask)
