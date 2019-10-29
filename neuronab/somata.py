@@ -30,7 +30,7 @@ from neuronab import (
 
 
 def get_mask(soma_marker, intensity_threshold=50., size_threshold=50, show=True):
-    """Get a binary mask indicating the presence or absence of soma in a
+    """Get a mask indicating the presence or absence of soma in a
     (immuno-)fluorescence image of a somatic marker.
 
     Arguments:
@@ -50,8 +50,10 @@ def get_mask(soma_marker, intensity_threshold=50., size_threshold=50, show=True)
 
     Returns:
     --------
-    soma_mask: numpy.bool array
-        Binary image indicating the presence of somata.
+    soma_mask: ndarray
+        Grayscale image indicating the presence of somata.
+        Pixel intensity scales approximately with the certainty that the pixel
+        is part of a soma.
 
     """
     # handle input
