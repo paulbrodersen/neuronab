@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 setup(
     name = 'neuronab',
     version = '0.0.0',
-    description = 'A python package to isolate neuronal structures such as neurites and synapses from immunofluorescence images.',
+    description = 'A python package to isolate neuronal structures such as somata, neurites, and synapses from (immuno-)fluorescence images.',
     author = 'Paul Brodersen',
     author_email = 'paulbrodersen+neuronab@gmail.com',
     url = 'https://github.com/paulbrodersen/neuronab',
@@ -18,5 +18,5 @@ setup(
     ],
     platforms=['Platform Independent'],
     packages=find_packages(),
-    install_requires=['numpy', 'matplotlib', 'phasepack'],
+    install_requires=['numpy', 'scipy', 'matplotlib', 'phasepack', 'scikit-image'],
 )
