@@ -124,7 +124,7 @@ def _remove_small_objects(binary_mask, size_threshold):
     return clean
 
 
-def get_length(neurite_mask, show=False):
+def get_length(neurite_mask, show=True):
     """
     Arguments:
     ----------
