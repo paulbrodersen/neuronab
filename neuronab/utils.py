@@ -35,8 +35,13 @@ def handle_image_input(path_or_array):
 
 def handle_grayscale_image_input(path_or_array):
     img = handle_image_input(path_or_array)
-    assert np.ndim(img) == 2, \
-        "Dimensionality of image is not 2! Is it really a grayscale image and not an RGB or RGBA image? Currently, ndim(img) = {}.".format(np.ndim(img))
+    if img.ndim == 2:
+        pass
+    elif img.ndim == 3:
+        warnings.warn("Grayscale image has 3 dimensions instead of the expected 2. Collapsing the last dimension by summing, ignoring the alpha channel.")
+        img = np.sum(img[:,:,:3], axis=-1)
+    else:
+        raise ValueError("Shape of image is {}, which is not a valid image dimensionality.".format(img.shape))
     return img
 
 def handle_rgb_image_input(path_or_array):
@@ -47,8 +52,14 @@ def handle_rgb_image_input(path_or_array):
 
 def handle_binary_image_input(path_or_array):
     img = handle_image_input(path_or_array)
-    assert np.ndim(img) == 2, \
-        "Dimensionality of image is not 2! Is it really a binary image and not an RGB or RGBA image? Currently, ndim(img) = {}.".format(np.ndim(img))
+    if img.ndim == 2:
+        pass
+    elif img.ndim == 3:
+        warnings.warn("Binary image has 3 dimensions instead of the expected 2. Collapsing the last dimension by summing, ignoring the alpha channel.")
+        img = np.sum(img[:,:,:3], axis=-1)
+    else:
+        raise ValueError("Shape of image is {}, which is not a valid image dimensionality.".format(img.shape))
+
     if img.dtype != np.bool:
         warnings.warn("Image not of type numpy.bool. Casting to numpy.bool ...")
         img = img.astype(np.bool)
