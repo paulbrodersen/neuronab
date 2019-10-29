@@ -65,6 +65,13 @@ def handle_binary_image_input(path_or_array):
         img = img.astype(np.bool)
     return img
 
+def plot_image_mask_comparison(img, mask, cmap='gray', *args, **kwargs):
+    enhanced = img.astype(np.float)
+    enhanced[mask] *= 1.1
+    images = [img, enhanced]
+    titles = ['Original image', 'With mask overlay']
+    return plot_image_collection(images, titles, cmap, nrows=1, ncols=2, *args, **kwargs)
+
 def plot_image_collection(images, titles, cmap='gray', *subplots_args, **subplots_kwargs):
     fig, axes = plt.subplots(sharex=True, sharey=True, *subplots_args, **subplots_kwargs)
     for img, title, ax in zip(images, titles, axes.ravel()):
