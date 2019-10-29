@@ -27,5 +27,6 @@ __email__ = "paulbrodersen+neuronab@gmail.com"
 
 import neuronab.neurites
 import neuronab.synapses
+import neuronab.somata
 import neuronab.cleaning
 import neuronab.utils
