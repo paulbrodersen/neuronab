@@ -12,7 +12,8 @@ import neuronab.cleaning as cleaning
 import neuronab.utils as utils
 
 
-def get_mask(neurite_marker, show=True, save=None):
+def get_mask(neurite_marker,
+             show=True):
     """Given a neurite stain image, returm a boolean mask that evaluates
     to true where there is a neurite. We carry out the following steps:
 
@@ -36,9 +37,6 @@ def get_mask(neurite_marker, show=True, save=None):
 
         show: bool (default True)
             if True, plots intermediate steps of image analysis
-
-        save: str (default None)
-    `      if not None (and show is True), figures will be saved under save+<1>.pdf
 
     Returns:
     --------
@@ -172,9 +170,6 @@ def get_length(neurite_mask, show=False, save=None):
         show: bool (default True)
             if True, plots intermediate steps of image analysis
 
-        save: str (default None)
-    `      if not None (and show is True), figures will be saved under save+<2>.pdf
-
     Returns:
     --------
         neurite_length: int
@@ -190,7 +185,5 @@ def get_length(neurite_mask, show=False, save=None):
         titles = ['Neurite mask', 'Medial axis']
         fig = utils.plot_image_collection(images, titles, nrows=1, ncols=2)
         fig.suptitle('Neurite length', fontsize='large')
-        if save != None:
-            fig.savefig(save + '{}.pdf'.format(2), dpi=300)
 
     return neurite_length
